@@ -1,6 +1,6 @@
 using Test
-using LinearAlgebra, TensorKit, TensorOperations
-using Revise
+using LinearAlgebra
+using TensorKit
 using SpatiallySymmetricTensors
 
 include("test_spatial_operations.jl");
