@@ -4,23 +4,13 @@ authors = ["Wei Tang <tangwei@smail.nju.edu.cn> and contributors"]
 version = "0.1.1"
 
 [deps]
-CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
-Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
-JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
 KrylovKit = "0b1a1467-8014-51b9-945f-bf0ae24f4b77"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 TensorKit = "07d1fe3e-3e46-537d-9eac-e9e13d0d4cec"
-TensorOperations = "6aa20fa7-93e2-5fca-9bc0-fbd0db3c71a2"
 
 [compat]
-CairoMakie = "0.12, 0.13"
-Combinatorics = "1"
-JLD2 = "0.4, 0.5"
 KrylovKit = "0.9.2"
-Revise = "3"
 TensorKit = "0.14.3"
-TensorOperations = "4, 5"
 julia = "1"
 
 [extras]
