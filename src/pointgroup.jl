@@ -2,11 +2,7 @@ abstract type AbstractPointGroup end
 
 function find_solution(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing)
     reps = get_reps(spg, reps_name)
-
     mt = mapping_table(T)
-    σd_mats = [spatial_operation(T, perm; _mapping_table=mt) for perm in get_perm(spg, :σd)] 
-    σv_mats = [spatial_operation(T, perm; _mapping_table=mt) for perm in get_perm(spg, :σv)] 
-    R_mats = [spatial_operation(T, perm; _mapping_table=mt) for perm in get_perm(spg, :R)] 
 
     if isnothing(P_filter)
         num_paras = num_free_parameters(T; _mapping_table=mt)
@@ -15,26 +11,21 @@ function find_solution(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name:
 
     P_sol = P_filter
 
-    for σd_mat in σd_mats
-        (size(P_sol, 2) == 0) && break
-        σd_mat1 = P_sol' * σd_mat * P_sol
-        Λσd, Uσd = eigen(Hermitian(σd_mat1))
-        Pσd = Uσd[:, Λσd .≈ reps[1]]
-        P_sol = P_sol * Pσd
+    println("init, size(P_sol) = ", size(P_sol))
+    for permutation in get_perm(spg, :σd)
+        f_op = linear_function_for_spatial_operation(permutation)
+        P_sol = find_subspace(T, P_sol, f_op; λ = reps[1], is_hermitian=true, _mapping_table=mt)
+        println("operation σd, size(P_sol) = ", size(P_sol))
     end
-    for σv_mat in σv_mats
-        (size(P_sol, 2) == 0) && break
-        σv_mat1 = P_sol' * σv_mat * P_sol
-        Λσv, Uσv = eigen(Hermitian(σv_mat1))
-        Pσv = Uσv[:, Λσv .≈ reps[2]]
-        P_sol = P_sol * Pσv
+    for permutation in get_perm(spg, :σv)
+        f_op = linear_function_for_spatial_operation(permutation)
+        P_sol = find_subspace(T, P_sol, f_op; λ = reps[2], is_hermitian=true, _mapping_table=mt)
+        println("operation σv, size(P_sol) = ", size(P_sol))
     end
-    for R_mat in R_mats
-        (size(P_sol, 2) == 0) && break
-        R_mat1 = P_sol' * R_mat * P_sol # R is not Hermitian
-        ΛR, UR = eigen(R_mat1)
-        PR = UR[:, ΛR .≈ reps[3]]
-        P_sol = P_sol * PR
+    for permutation in get_perm(spg, :R)
+        f_op = linear_function_for_spatial_operation(permutation)
+        P_sol = find_subspace(T, P_sol, f_op; λ = reps[3], is_hermitian=false, _mapping_table=mt)
+        println("operation R, size(P_sol) = ", size(P_sol))
     end
 
     # solution 
