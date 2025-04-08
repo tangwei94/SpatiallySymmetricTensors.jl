@@ -85,29 +85,12 @@ function selector(T::AbstractTensorMap, condition::Function; _mapping_table::Map
         f1, f2, a, n = _mapping_table[ix]
         condition(f1, f2) && (Pd[a:a+n-1] .= 1)
     end
-    return P
+    return P[:, Pd .== 1] 
 end
 
-"""
-    spatial_operation(T::AbstractTensorMap, permutations; _mapping_table=mapping_table(T))
-
-    - When you do a spatial operation to a symmetric tensor, you map a symmetric tensor to another symmetric tensor. 
-    - This mapping can be represented by a matrix defined in the linear space of the free parameters of the symmetric tensor.
-    - The function `spatial_operation` returns this matrix.
-
-"""
-function spatial_operation(T::AbstractTensorMap, permutations; _mapping_table::MappingTable=mapping_table(T))
-    num_paras = num_free_parameters(T; _mapping_table=_mapping_table)
-    M = zeros(ComplexF64, num_paras, num_paras)
-    for ix in 1:num_paras
-        paras = zeros(ComplexF64, num_paras)
-        paras[ix] = 1
-    
-        T1 = set_data_by_vector(T, paras; _mapping_table=_mapping_table)
-
-        RT = permute(T1, permutations)
-        X = vec(RT)
-        M[:, ix] = X 
-    end
-    return M
+function linear_function_for_spatial_operation(permutation)
+    return ((T1) -> permute(T1, permutation))
+end
+function matrix_for_spatial_operation(T::AbstractTensorMap, permutation; _mapping_table::MappingTable=mapping_table(T))
+    return matrix_for_linear_function(T, linear_function_for_spatial_operation(permutation); _mapping_table=_mapping_table)
 end

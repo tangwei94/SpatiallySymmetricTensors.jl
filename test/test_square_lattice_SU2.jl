@@ -1,4 +1,5 @@
 @testset "test T_1_3_A1" begin
+    @show "test T_1_3_A1, short-range RVB state"
     T1 = SpatiallySymmetricTensors.T_1_3_A1()
     T2 = SpatiallySymmetricTensors.T_1_3_A1_from_plain()
     _, ix = findmax(norm.(T1.data))
@@ -8,6 +9,7 @@
 end
 
 @testset "test T_3_1_A1" begin
+    @show "test T_3_1_A1, long-range RVB state"
     T1 = SpatiallySymmetricTensors.T_3_1_A1()
     T2 = SpatiallySymmetricTensors.T_3_1_A1_from_plain()
     _, ix = findmax(norm.(T1.data))
