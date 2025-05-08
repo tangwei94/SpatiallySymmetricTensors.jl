@@ -1,6 +1,6 @@
 abstract type AbstractPointGroup end
 
-function find_solution(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing)
+function find_subspace(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing)
     reps = get_reps(spg, reps_name)
     mt = mapping_table(T)
 
@@ -27,14 +27,10 @@ function find_solution(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name:
         P_sol = find_subspace(T, P_sol, f_op; λ = reps[3], is_hermitian=false, _mapping_table=mt)
         println("operation R, size(P_sol) = ", size(P_sol))
     end
+    return P_sol
+end
 
-    # solution 
-    num_solutions = size(P_sol, 2)
-    sols = [set_data_by_vector(T, vec(P_sol[:, ix]); _mapping_table=mt) for ix in 1:num_solutions]
-
-    #for sol in sols, perm in [get_perm(spg, :σd); get_perm(spg, :σv); get_perm(spg, :R)] 
-    #    @show norm(sol - permute(sol, perm))
-    #end
-
-    return [sol / norm(sol) for sol in sols]
+function find_solution(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing)
+    P_sol = find_subspace(spg, T, reps_name; P_filter=P_filter)
+    return find_solution(T, P_sol)
 end
