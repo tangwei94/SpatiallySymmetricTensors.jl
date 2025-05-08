@@ -45,3 +45,8 @@ function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Fun
     return P_sol
 end
 
+function find_solution(T::AbstractTensorMap, P_sol::Matrix{<:Number}; _mapping_table::MappingTable=mapping_table(T))
+    num_solutions = size(P_sol, 2)
+    sols = [set_data_by_vector(T, vec(P_sol[:, ix]); _mapping_table=_mapping_table) for ix in 1:num_solutions]
+    return [sol / norm(sol) for sol in sols]
+end
