@@ -12,7 +12,7 @@ TensorKit = "07d1fe3e-3e46-537d-9eac-e9e13d0d4cec"
 [compat]
 KrylovKit = "0.9.2"
 Revise = "3.7.3"
-TensorKit = "0.14.3"
+TensorKit = "0.14.3, 0.15"
 julia = "1"
 
 [extras]

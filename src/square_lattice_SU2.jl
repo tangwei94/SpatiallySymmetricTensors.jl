@@ -148,8 +148,8 @@ function spin_exchange()
     P = SU2Space(1//2=>1)
 
     VA = SU2Space(1 => 1)
-    Sleft = TensorMap(ones, ComplexF64, P, P*VA) * sqrt(3/4)
-    Sright = -TensorMap(ones, ComplexF64, VA*P, P) * sqrt(3/4)
+    Sleft = ones(ComplexF64, P, P*VA) * sqrt(3/4)
+    Sright = -ones(ComplexF64, VA*P, P) * sqrt(3/4)
 
     return Sleft, Sright
 end
