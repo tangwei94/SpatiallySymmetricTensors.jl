@@ -85,6 +85,7 @@ end
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^4)
 
+    @test_throws ArgumentError find_subspace(C3v(), T, :BadRep)
     @test_throws ArgumentError find_subspace(C4v(), T, :BadRep)
     @test_throws ArgumentError find_subspace(C6v(), T, :BadRep)
     @test_throws ArgumentError find_subspace(C4(), T, :BadRep)
@@ -93,7 +94,7 @@ end
 
 @testset "invalid point-group perm ops" begin
     # unknown operation names should throw for each point group
-    for g in (C4v(), C6v(), C4(), D2())
+    for g in (C3v(), C4v(), C6v(), C4(), D2())
         @test_throws ArgumentError SpatiallySymmetricTensors.get_perm(g, :BadOp)
     end
 end
@@ -163,6 +164,7 @@ end
 @testset "pointgroup get_perm" begin
     # basic sanity: counts and permutation structure per point group/operator
     groups = [
+        (C3v(), Dict(:σd=>0, :σv=>3, :R=>2), 4),
         (C4v(), Dict(:σd=>2, :σv=>2, :R=>2), 5),
         (C6v(), Dict(:σd=>3, :σv=>3, :R=>2), 7),
         (C4(), Dict(:σd=>0, :σv=>0, :R=>2), 5),
@@ -201,8 +203,8 @@ end
         return res
     end
 
-    for g in (C4v(), C6v(), D2(), C4())
-        nlegs = g isa C6v ? 7 : 5
+    for g in (C3v(), C4v(), C6v(), D2(), C4())
+        nlegs = g isa C6v ? 7 : (g isa C3v ? 4 : 5)
         for op in (:σd, :σv)
             for p in SpatiallySymmetricTensors.get_perm(g, op)
                 @test is_identity_perm(compose_perm(p, p), nlegs)
@@ -216,6 +218,9 @@ end
     for p in SpatiallySymmetricTensors.get_perm(C6v(), :R)
         @test is_identity_perm(perm_power(p, 6), 7)
     end
+    for p in SpatiallySymmetricTensors.get_perm(C3v(), :R)
+        @test is_identity_perm(perm_power(p, 3), 4)
+    end
 
     c4v_r = SpatiallySymmetricTensors.get_perm(C4v(), :R)
     @test is_identity_perm(compose_perm(c4v_r[1], c4v_r[2]), 5)
@@ -224,4 +229,8 @@ end
     c6v_r = SpatiallySymmetricTensors.get_perm(C6v(), :R)
     @test is_identity_perm(compose_perm(c6v_r[1], c6v_r[2]), 7)
     @test is_identity_perm(compose_perm(c6v_r[2], c6v_r[1]), 7)
+
+    c3v_r = SpatiallySymmetricTensors.get_perm(C3v(), :R)
+    @test is_identity_perm(compose_perm(c3v_r[1], c3v_r[2]), 4)
+    @test is_identity_perm(compose_perm(c3v_r[2], c3v_r[1]), 4)
 end
