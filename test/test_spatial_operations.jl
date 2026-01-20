@@ -144,3 +144,67 @@ end
     @test size(Psel, 2) == length(indices)
     @test Psel == Matrix{ComplexF64}(I, num_paras, num_paras)[:, indices]
 end
+
+@testset "pointgroup get_perm" begin
+    groups = [
+        (C4v(), Dict(:σd=>2, :σv=>2, :R=>2), 5),
+        (C6v(), Dict(:σd=>3, :σv=>3, :R=>2), 7),
+        (C4(), Dict(:σd=>0, :σv=>0, :R=>2), 5),
+        (D2(), Dict(:σd=>0, :σv=>2, :R=>0), 5),
+    ]
+    for (g, counts, nlegs) in groups
+        for (op, expected) in counts
+            perms = SpatiallySymmetricTensors.get_perm(g, op)
+            @test length(perms) == expected
+            for perm in perms
+                @test perm[1] == (1,)
+                @test sort(collect(perm[2])) == collect(2:nlegs)
+            end
+        end
+    end
+end
+
+@testset "pointgroup perm algebra" begin
+    function compose_perm(p1, p2)
+        a = p1[2]
+        b = p2[2]
+        composed = ntuple(i -> a[b[i] - 1], length(a))
+        return (p1[1], composed)
+    end
+
+    function is_identity_perm(p, nlegs)
+        return p[1] == (1,) && p[2] == ntuple(i -> i + 1, nlegs - 1)
+    end
+
+    function perm_power(p, k)
+        res = p
+        for _ in 2:k
+            res = compose_perm(res, p)
+        end
+        return res
+    end
+
+    for g in (C4v(), C6v(), D2(), C4())
+        nlegs = g isa C6v ? 7 : 5
+        for op in (:σd, :σv)
+            for p in SpatiallySymmetricTensors.get_perm(g, op)
+                @test is_identity_perm(compose_perm(p, p), nlegs)
+            end
+        end
+    end
+
+    for p in SpatiallySymmetricTensors.get_perm(C4v(), :R)
+        @test is_identity_perm(perm_power(p, 4), 5)
+    end
+    for p in SpatiallySymmetricTensors.get_perm(C6v(), :R)
+        @test is_identity_perm(perm_power(p, 6), 7)
+    end
+
+    c4v_r = SpatiallySymmetricTensors.get_perm(C4v(), :R)
+    @test is_identity_perm(compose_perm(c4v_r[1], c4v_r[2]), 5)
+    @test is_identity_perm(compose_perm(c4v_r[2], c4v_r[1]), 5)
+
+    c6v_r = SpatiallySymmetricTensors.get_perm(C6v(), :R)
+    @test is_identity_perm(compose_perm(c6v_r[1], c6v_r[2]), 7)
+    @test is_identity_perm(compose_perm(c6v_r[2], c6v_r[1]), 7)
+end
