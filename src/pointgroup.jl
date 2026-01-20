@@ -22,23 +22,41 @@ function find_subspace(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name:
     if verbose
         println("init, size(P_sol) = ", size(P_sol))
     end
-    for permutation in get_perm(spg, :σd)
+    for (idx, permutation) in enumerate(get_perm(spg, :σd))
         f_op = linear_function_for_spatial_operation(permutation)
-        P_sol = find_subspace(T, P_sol, f_op; λ=reps[1], is_hermitian=true, tol=tol, _mapping_table=mt)
+        rep = reps[1]
+        rep_val = rep isa AbstractVector ? rep[idx] : rep
+        if rep_val isa AbstractMatrix
+            P_sol = find_subspace_matrixrep(T, P_sol, f_op, rep_val; tol=tol, _mapping_table=mt)
+        else
+            P_sol = find_subspace(T, P_sol, f_op; λ=rep_val, is_hermitian=true, tol=tol, _mapping_table=mt)
+        end
         if verbose
             println("operation σd, size(P_sol) = ", size(P_sol))
         end
     end
-    for permutation in get_perm(spg, :σv)
+    for (idx, permutation) in enumerate(get_perm(spg, :σv))
         f_op = linear_function_for_spatial_operation(permutation)
-        P_sol = find_subspace(T, P_sol, f_op; λ=reps[2], is_hermitian=true, tol=tol, _mapping_table=mt)
+        rep = reps[2]
+        rep_val = rep isa AbstractVector ? rep[idx] : rep
+        if rep_val isa AbstractMatrix
+            P_sol = find_subspace_matrixrep(T, P_sol, f_op, rep_val; tol=tol, _mapping_table=mt)
+        else
+            P_sol = find_subspace(T, P_sol, f_op; λ=rep_val, is_hermitian=true, tol=tol, _mapping_table=mt)
+        end
         if verbose
             println("operation σv, size(P_sol) = ", size(P_sol))
         end
     end
-    for permutation in get_perm(spg, :R)
+    for (idx, permutation) in enumerate(get_perm(spg, :R))
         f_op = linear_function_for_spatial_operation(permutation)
-        P_sol = find_subspace(T, P_sol, f_op; λ=reps[3], is_hermitian=false, tol=tol, _mapping_table=mt)
+        rep = reps[3]
+        rep_val = rep isa AbstractVector ? rep[idx] : rep
+        if rep_val isa AbstractMatrix
+            P_sol = find_subspace_matrixrep(T, P_sol, f_op, rep_val; tol=tol, _mapping_table=mt)
+        else
+            P_sol = find_subspace(T, P_sol, f_op; λ=rep_val, is_hermitian=false, tol=tol, _mapping_table=mt)
+        end
         if verbose
             println("operation R, size(P_sol) = ", size(P_sol))
         end

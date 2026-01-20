@@ -18,6 +18,49 @@ function matrix_for_linear_function(T::AbstractTensorMap, f_op::Function; _mappi
 end
 
 """
+    find_subspace_matrixrep(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function, D::AbstractMatrix;
+        tol=1e-8, _mapping_table=mapping_table(T))
+
+Project `P_init` onto the subspace transforming as matrix representation `D` under `f_op`.
+Returns a basis matrix for the resulting subspace.
+"""
+function find_subspace_matrixrep(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function, D::AbstractMatrix;
+    tol::Real=1e-8, _mapping_table::MappingTable=mapping_table(T))
+
+    init_subspace_size = size(P_init, 2)
+    if init_subspace_size == 0
+        println("input subspace is empty")
+        return P_init
+    end
+    if size(D, 1) != size(D, 2)
+        throw(ArgumentError("representation matrix must be square"))
+    end
+
+    M_op = matrix_for_linear_function(T, f_op; _mapping_table=_mapping_table)
+
+    k = size(P_init, 2)
+    d = size(D, 1)
+    Tprom = promote_type(eltype(M_op), eltype(D))
+    D = Matrix{Tprom}(D)
+    I_d = Matrix{Tprom}(I, d, d)
+    MP = Matrix{Tprom}(M_op * P_init)
+    Pp = Matrix{Tprom}(P_init)
+    K = kron(I_d, MP) - kron(transpose(D), Pp)
+    _, S, V = svd(K)
+    idx = findall(s -> s <= tol, S)
+    if isempty(idx)
+        return P_init[:, 1:0]
+    end
+
+    cols = Matrix{Tprom}(undef, size(P_init, 1), 0)
+    for j in idx
+        X = reshape(V[:, j], k, d)
+        cols = hcat(cols, P_init * X)
+    end
+    return cols
+end
+
+"""
     find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function; λ=1.0, is_hermitian=false, tol=1e-8, _mapping_table=mapping_table(T))
 
 Project an initial subspace `P_init` onto the eigenspace of `f_op` with eigenvalue `λ`.
