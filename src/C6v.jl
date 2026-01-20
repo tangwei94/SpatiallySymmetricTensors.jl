@@ -27,4 +27,5 @@ function get_perm(::C6v, name::Symbol)
     (name == :σd) && return [C6v_σd1, C6v_σd2, C6v_σd3] 
     (name == :σv) && return [C6v_σv1, C6v_σv2, C6v_σv3]
     (name == :R) && return [C6v_R1, C6v_R2]
+    throw(ArgumentError("unknown operation name $(name) for C6v"))
 end

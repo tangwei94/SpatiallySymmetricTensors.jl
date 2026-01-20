@@ -18,4 +18,5 @@ function get_perm(::C4, name::Symbol)
     (name == :σd) && return [] # empty diagonal reflections
     (name == :σv) && return [] # empty horizontal and vertical reflections
     (name == :R) && return [C4_R1, C4_R2]
+    throw(ArgumentError("unknown operation name $(name) for C4"))
 end

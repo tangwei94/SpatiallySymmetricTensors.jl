@@ -18,4 +18,5 @@ function get_perm(::D2, name::Symbol)
     (name == :σd) && return [] # empty diagonal reflections
     (name == :σv) && return [D2_σv1, D2_σv2]
     (name == :R) && return [] # empty rotations
+    throw(ArgumentError("unknown operation name $(name) for D2"))
 end

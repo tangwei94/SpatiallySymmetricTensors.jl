@@ -25,4 +25,5 @@ function get_perm(::C4v, name::Symbol)
     (name == :σd) && return [C4v_σd1, C4v_σd2] 
     (name == :σv) && return [C4v_σv1, C4v_σv2]
     (name == :R) && return [C4v_R1, C4v_R2]
+    throw(ArgumentError("unknown operation name $(name) for C4v"))
 end

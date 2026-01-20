@@ -91,6 +91,13 @@ end
     @test_throws ArgumentError find_subspace(D2(), T, :BadRep)
 end
 
+@testset "invalid point-group perm ops" begin
+    # unknown operation names should throw for each point group
+    for g in (C4v(), C6v(), C4(), D2())
+        @test_throws ArgumentError SpatiallySymmetricTensors.get_perm(g, :BadOp)
+    end
+end
+
 @testset "pointgroup verbosity" begin
     # default verbosity is silent and should return a valid subspace
     V = SU2Space(1//2=>1, 0=>1)
