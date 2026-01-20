@@ -236,7 +236,7 @@ end
 end
 
 @testset "C4v E irrep" begin
-    P = ℂ^1
+    P = ℂ^2
     V = ℂ^2
     T = zeros(ComplexF64, P, V^4)
 
@@ -257,6 +257,29 @@ end
                 cols = P_E[:, (b - 1) * 2 + 1:b * 2]
                 @test norm(M * cols - cols * D) < 1e-10
             end
+        end
+    end
+end
+
+@testset "C4v E irrep with U1GradedSpace" begin
+    P = U1Space(0=>1, 1=>1, -1=>1)
+    V = U1Space(0=>3, 1=>1, -1=>1)
+    T = zeros(ComplexF64, P, V^4)
+
+    mt = mapping_table(T)
+    P_E = find_subspace(C4v(), T, :E)
+    @test size(P_E, 2) % 2 == 0
+    @test size(P_E, 2) > 0
+    reps = SpatiallySymmetricTensors.get_reps(C4v(), :E)
+    ops = [(:σd, reps[1]), (:σv, reps[2]), (:R, reps[3])]
+    for (op, rep_list) in ops
+        perms = SpatiallySymmetricTensors.get_perm(C4v(), op)
+        @test length(perms) == length(rep_list)
+        for perm in perms
+            M = matrix_for_spatial_operation(T, perm; _mapping_table=mt)
+            MC = M * P_E
+            MC_proj = P_E * (P_E \ MC)
+            @test norm(MC - MC_proj) / max(norm(MC), eps()) < 1e-2
         end
     end
 end
