@@ -1,5 +1,5 @@
 @testset "test set_data_by_vector and vec" begin 
-    # TODO. more test cases
+    # round-trip between vectorized parameters and symmetric tensor storage
     V = SU2Space(1//2=>1, 0=>1);
     P = SU2Space(1//2=>1);
     T = zeros(ComplexF64, P, V^4);
@@ -12,6 +12,7 @@
     T1 = set_data_by_vector(T, v; _mapping_table=mt)
     @test norm(vec(T1) - v) < 1e-12
 
+    # in-place setter returns the same tensor and mutates as expected
     T2 = similar(T)
     T2_ref = set_data_by_vector!(T2, v; _mapping_table=mt)
     @test T2_ref === T2
@@ -47,6 +48,7 @@ end
 end
 
 @testset "empty eigenspace" begin
+    # no eigenvalue match should return an empty subspace (hermitian case)
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^4)
@@ -62,6 +64,7 @@ end
 end
 
 @testset "empty eigenspace (non-hermitian)" begin
+    # same as above, but for non-hermitian branch
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^4)
@@ -77,6 +80,7 @@ end
 end
 
 @testset "invalid point-group reps" begin
+    # unknown representation names should throw for each point group
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^4)
@@ -88,6 +92,7 @@ end
 end
 
 @testset "pointgroup verbosity" begin
+    # default verbosity is silent and should return a valid subspace
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^4)
@@ -97,6 +102,7 @@ end
 end
 
 @testset "non-orthonormal tolerance" begin
+    # orthonormality check should respect the tolerance parameter
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^4)
@@ -113,6 +119,7 @@ end
 end
 
 @testset "selector identity" begin
+    # selector with a true condition should be the identity projector
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^4)
@@ -124,6 +131,7 @@ end
 end
 
 @testset "selector columns" begin
+    # selector should match the explicit column subset for a condition
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^4)
@@ -146,6 +154,7 @@ end
 end
 
 @testset "pointgroup get_perm" begin
+    # basic sanity: counts and permutation structure per point group/operator
     groups = [
         (C4v(), Dict(:σd=>2, :σv=>2, :R=>2), 5),
         (C6v(), Dict(:σd=>3, :σv=>3, :R=>2), 7),
@@ -165,6 +174,7 @@ end
 end
 
 @testset "pointgroup perm algebra" begin
+    # check involution for reflections and group order/inverse for rotations
     function compose_perm(p1, p2)
         a = p1[2]
         b = p2[2]
