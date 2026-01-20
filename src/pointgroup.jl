@@ -1,5 +1,13 @@
+"""
+Abstract point group type for spatial symmetry operations.
+"""
 abstract type AbstractPointGroup end
 
+"""
+    find_subspace(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing, verbose=false, tol=1e-8)
+
+Find the subspace of `T` transforming under the representation `reps_name` of `spg`.
+"""
 function find_subspace(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing, verbose::Bool=false, tol::Real=1e-8)
     reps = get_reps(spg, reps_name)
     mt = mapping_table(T)
@@ -38,6 +46,11 @@ function find_subspace(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name:
     return P_sol
 end
 
+"""
+    find_solution(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing)
+
+Return normalized tensor solutions transforming under `reps_name` of `spg`.
+"""
 function find_solution(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing)
     P_sol = find_subspace(spg, T, reps_name; P_filter=P_filter)
     return find_solution(T, P_sol)

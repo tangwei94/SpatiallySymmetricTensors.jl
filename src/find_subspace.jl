@@ -1,3 +1,8 @@
+"""
+    matrix_for_linear_function(T::AbstractTensorMap, f_op::Function; _mapping_table=mapping_table(T))
+
+Return the matrix representation of `f_op` in the free-parameter basis of `T`.
+"""
 function matrix_for_linear_function(T::AbstractTensorMap, f_op::Function; _mapping_table::MappingTable=mapping_table(T))
     num_paras = num_free_parameters(T; _mapping_table=_mapping_table)
     M = zeros(ComplexF64, num_paras, num_paras)
@@ -12,6 +17,12 @@ function matrix_for_linear_function(T::AbstractTensorMap, f_op::Function; _mappi
     return M
 end
 
+"""
+    find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function; λ=1.0, is_hermitian=false, tol=1e-8, _mapping_table=mapping_table(T))
+
+Project an initial subspace `P_init` onto the eigenspace of `f_op` with eigenvalue `λ`.
+Returns the basis matrix for the resulting subspace.
+"""
 function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function; λ::Real=1.0, is_hermitian::Bool=false, tol::Real=1e-8, _mapping_table::MappingTable=mapping_table(T))
 
     init_subspace_size = size(P_init, 2)
@@ -51,6 +62,11 @@ function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Fun
     return P_sol
 end
 
+"""
+    find_solution(T::AbstractTensorMap, P_sol::Matrix{<:Number}; _mapping_table=mapping_table(T))
+
+Convert a solution subspace `P_sol` into normalized symmetric tensor solutions.
+"""
 function find_solution(T::AbstractTensorMap, P_sol::Matrix{<:Number}; _mapping_table::MappingTable=mapping_table(T))
     num_solutions = size(P_sol, 2)
     sols = [set_data_by_vector(T, vec(P_sol[:, ix]); _mapping_table=_mapping_table) for ix in 1:num_solutions]

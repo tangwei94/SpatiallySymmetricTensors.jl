@@ -1,11 +1,21 @@
 const U1GradedSpace = GradedSpace{U1Irrep, TensorKit.SortedVectorDict{U1Irrep, Int64}}
 
+"""
+    u1_charge_conjugation(f::FusionTree{U1Irrep})
+
+Return the charge-conjugated fusion tree.
+"""
 function u1_charge_conjugation(f::FusionTree{U1Irrep})
     uncoupled = Tuple(U1Irrep(-x.charge) for x in f.uncoupled)
     coupled = U1Irrep(-f.coupled.charge) 
     return FusionTree(uncoupled, coupled, f.isdual, f.innerlines, f.vertices)
 end
 
+"""
+    u1_charge_conjugation(T::AbstractTensorMap{N, U1GradedSpace}) where N
+
+Apply charge conjugation to a U(1)-graded tensor map.
+"""
 function u1_charge_conjugation(T::AbstractTensorMap{N, U1GradedSpace}) where N
     T_mapped = deepcopy(T)
     for (f1, f2) in fusiontrees(T)
@@ -20,6 +30,11 @@ function u1_charge_conjugation(T::AbstractTensorMap{N, U1GradedSpace}) where N
     return T_mapped
 end
   
+"""
+    find_subspace_for_u1_charge_conjugation(T::AbstractTensorMap{N, U1GradedSpace}, P_init::Matrix{<:Number}; λ=1.0, _mapping_table=mapping_table(T)) where N
+
+Project `P_init` onto the charge-conjugation eigenspace with eigenvalue `λ`.
+"""
 function find_subspace_for_u1_charge_conjugation(T::AbstractTensorMap{N, U1GradedSpace}, P_init::Matrix{<:Number}; λ::Real=1.0, _mapping_table::MappingTable=mapping_table(T)) where N
     return find_subspace(T, P_init, u1_charge_conjugation; λ=λ, _mapping_table=_mapping_table)
 end

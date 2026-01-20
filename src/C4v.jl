@@ -1,3 +1,4 @@
+"""C4v point group (square lattice with reflections and rotations)."""
 struct C4v <: AbstractPointGroup end
 
 const C4v_σd1 = ((1, ), (3, 2, 5, 4))

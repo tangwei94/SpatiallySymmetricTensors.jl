@@ -1,3 +1,4 @@
+"""C6v point group (hexagonal lattice with reflections and rotations)."""
 struct C6v <: AbstractPointGroup end
 
 const C6v_R1 = ((1, ), (3, 4, 5, 6, 7, 2))

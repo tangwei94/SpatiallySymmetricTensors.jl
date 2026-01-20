@@ -1,3 +1,4 @@
+"""C4 point group (rotations only)."""
 struct C4 <: AbstractPointGroup end
 
 # in the order of σd, σv, R; see http://symmetry.jacobs-university.de/cgi-bin/group.cgi?group=204&option=4

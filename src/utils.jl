@@ -1,5 +1,10 @@
 const MPOTensor{T,S} = AbstractTensorMap{T,S,2,2} where {T,S}
 
+"""
+    mpo_ovlp(A1, A2)
+
+Return the dominant eigenpair of the MPO overlap transfer operator.
+"""
 function mpo_ovlp(A1, A2)
     V1 = space(A1, 1)
     V2 = space(A2, 1)
@@ -13,6 +18,11 @@ function mpo_ovlp(A1, A2)
     return eigsolve(mpo_transf, v0, 1, :LM)
 end
 
+"""
+    mpotensor_dag(T::MPOTensor)
+
+Return the Hermitian conjugate of an MPO tensor.
+"""
 function mpotensor_dag(T::MPOTensor)
     T_data = reshape(T.data, (dims(codomain(T))..., dims(domain(T))...))
     Tdag_data = permutedims(conj.(T_data), (1, 3, 2, 4))
@@ -20,6 +30,11 @@ function mpotensor_dag(T::MPOTensor)
     return TensorMap(Tdag_data, space(T))
 end
 
+"""
+    mpo_hermicity(A)
+
+Return a norm ratio diagnosing Hermiticity of MPO `A`.
+"""
 function mpo_hermicity(A)
     v_space = space(A, 1)
     function AA_transf(v)
@@ -43,6 +58,11 @@ function mpo_hermicity(A)
     return norm(aā / aa) 
 end
 
+"""
+    mpo_normality(A)
+
+Return a norm ratio diagnosing normality of MPO `A`.
+"""
 function mpo_normality(A)
     v_space = space(A, 1)
 

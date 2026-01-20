@@ -1,3 +1,4 @@
+"""D2 point group (two reflections)."""
 struct D2 <: AbstractPointGroup end
 
 # in the order of σd, σv, R; see http://symmetry.jacobs-university.de/cgi-bin/group.cgi?group=302&option=4
