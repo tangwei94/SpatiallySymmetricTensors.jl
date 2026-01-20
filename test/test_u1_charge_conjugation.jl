@@ -5,7 +5,7 @@
     V = U1Space(-1=>1, 0=>1, 1=>1);
 
     # A1 PEPS tensors
-    T = TensorMap(zeros, ComplexF64, fuse(P, Pa), V^4);
+    T = zeros(ComplexF64, fuse(P, Pa), V^4);
 
     # zeroth order, only one solution: (0, 0, 0, 0) -> (1, -1) 
     P0 = selector(T, 
