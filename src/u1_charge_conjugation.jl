@@ -22,10 +22,15 @@ function u1_charge_conjugation(T::AbstractTensorMap{N, U1GradedSpace}) where N
         f1_mapped = u1_charge_conjugation(f1)
         f2_mapped = u1_charge_conjugation(f2)
 
-        if size(T[f1, f2]) != size(T_mapped[f1_mapped, f2_mapped])
-            @error "size mismatch" f1, f2
+        mapped_block = try
+            T_mapped[f1_mapped, f2_mapped]
+        catch err
+            throw(ArgumentError("missing charge-conjugated block for $(f1), $(f2): $(err)"))
         end
-        T_mapped[f1_mapped, f2_mapped] .= T[f1, f2]
+        if size(T[f1, f2]) != size(mapped_block)
+            throw(ArgumentError("size mismatch for charge-conjugated block $(f1), $(f2)"))
+        end
+        mapped_block .= T[f1, f2]
     end
     return T_mapped
 end

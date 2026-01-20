@@ -41,3 +41,11 @@
 
     @test norm(T1_even_auto - T1_even / norm(T1_even)) < 1e-12
 end
+
+@testset "u1_charge_conjugation missing blocks" begin
+    P = U1Space(1=>1)
+    V = U1Space(0=>1, 1=>1)
+    T = zeros(ComplexF64, P, V^2)
+
+    @test_throws ArgumentError u1_charge_conjugation(T)
+end
