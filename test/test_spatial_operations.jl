@@ -40,3 +40,49 @@ end
         end
     end
 end
+
+@testset "empty eigenspace" begin
+    V = SU2Space(1//2=>1, 0=>1)
+    P = SU2Space(1//2=>1)
+    T = zeros(ComplexF64, P, V^4)
+
+    mt = mapping_table(T)
+    num_paras = num_free_parameters(T; _mapping_table=mt)
+    P_init = Matrix{ComplexF64}(I, num_paras, num_paras)
+
+    f_op(T1) = T1
+    P_sol = find_subspace(T, P_init, f_op; λ=2.0, is_hermitian=true, _mapping_table=mt)
+    @test size(P_sol, 1) == num_paras
+    @test size(P_sol, 2) == 0
+end
+
+@testset "invalid point-group reps" begin
+    V = SU2Space(1//2=>1, 0=>1)
+    P = SU2Space(1//2=>1)
+    T = zeros(ComplexF64, P, V^4)
+
+    @test_throws ArgumentError find_subspace(C4v(), T, :BadRep)
+    @test_throws ArgumentError find_subspace(C6v(), T, :BadRep)
+    @test_throws ArgumentError find_subspace(C4(), T, :BadRep)
+    @test_throws ArgumentError find_subspace(D2(), T, :BadRep)
+end
+
+@testset "pointgroup verbosity" begin
+    V = SU2Space(1//2=>1, 0=>1)
+    P = SU2Space(1//2=>1)
+    T = zeros(ComplexF64, P, V^4)
+
+    P_sol = find_subspace(C4v(), T, :A1; verbose=false)
+    @test size(P_sol, 1) == num_free_parameters(T)
+end
+
+@testset "selector identity" begin
+    V = SU2Space(1//2=>1, 0=>1)
+    P = SU2Space(1//2=>1)
+    T = zeros(ComplexF64, P, V^4)
+
+    mt = mapping_table(T)
+    num_paras = num_free_parameters(T; _mapping_table=mt)
+    Psel = selector(T, (f1, f2) -> true; _mapping_table=mt)
+    @test Psel == Matrix{ComplexF64}(I, num_paras, num_paras)
+end

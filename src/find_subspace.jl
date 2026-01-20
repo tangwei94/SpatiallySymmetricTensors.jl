@@ -12,7 +12,7 @@ function matrix_for_linear_function(T::AbstractTensorMap, f_op::Function; _mappi
     return M
 end
 
-function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function; λ::Real=1.0, is_hermitian::Bool=false, _mapping_table::MappingTable=mapping_table(T))
+function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function; λ::Real=1.0, is_hermitian::Bool=false, tol::Real=1e-8, _mapping_table::MappingTable=mapping_table(T))
 
     init_subspace_size = size(P_init, 2)
     if init_subspace_size == 0
@@ -20,7 +20,7 @@ function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Fun
         return P_init
     end
 
-    if norm(P_init' * P_init - Matrix{eltype(P_init)}(I, init_subspace_size, init_subspace_size)) > 1e-8
+    if norm(P_init' * P_init - Matrix{eltype(P_init)}(I, init_subspace_size, init_subspace_size)) > tol
         #for ix in 1:init_subspace_size
         #    for iy in 1:init_subspace_size
         #        print(" ", (P_init' * P_init)[ix, iy], " ")
@@ -34,11 +34,17 @@ function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Fun
     M_op_sub = P_init' * M_op * P_init
     if ! is_hermitian
         Λop, Uop = eigen(M_op_sub)
-        Pop = Uop[:, norm.(Λop .- λ) .< 1e-8]
+        Pop = Uop[:, norm.(Λop .- λ) .< tol]
+        if size(Pop, 2) == 0
+            return P_init[:, 1:0]
+        end
         Pop = Matrix(qr(Pop).Q) # orthonormalize the basis
     else
         Λop, Uop = eigen(Hermitian(M_op_sub))
-        Pop = Uop[:, norm.(Λop .- λ) .< 1e-8]
+        Pop = Uop[:, norm.(Λop .- λ) .< tol]
+        if size(Pop, 2) == 0
+            return P_init[:, 1:0]
+        end
     end
 
     P_sol = P_init * Pop

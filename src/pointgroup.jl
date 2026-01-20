@@ -1,6 +1,6 @@
 abstract type AbstractPointGroup end
 
-function find_subspace(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing)
+function find_subspace(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing, verbose::Bool=false, tol::Real=1e-8)
     reps = get_reps(spg, reps_name)
     mt = mapping_table(T)
 
@@ -11,21 +11,29 @@ function find_subspace(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name:
 
     P_sol = P_filter
 
-    println("init, size(P_sol) = ", size(P_sol))
+    if verbose
+        println("init, size(P_sol) = ", size(P_sol))
+    end
     for permutation in get_perm(spg, :σd)
         f_op = linear_function_for_spatial_operation(permutation)
-        P_sol = find_subspace(T, P_sol, f_op; λ = reps[1], is_hermitian=true, _mapping_table=mt)
-        println("operation σd, size(P_sol) = ", size(P_sol))
+        P_sol = find_subspace(T, P_sol, f_op; λ=reps[1], is_hermitian=true, tol=tol, _mapping_table=mt)
+        if verbose
+            println("operation σd, size(P_sol) = ", size(P_sol))
+        end
     end
     for permutation in get_perm(spg, :σv)
         f_op = linear_function_for_spatial_operation(permutation)
-        P_sol = find_subspace(T, P_sol, f_op; λ = reps[2], is_hermitian=true, _mapping_table=mt)
-        println("operation σv, size(P_sol) = ", size(P_sol))
+        P_sol = find_subspace(T, P_sol, f_op; λ=reps[2], is_hermitian=true, tol=tol, _mapping_table=mt)
+        if verbose
+            println("operation σv, size(P_sol) = ", size(P_sol))
+        end
     end
     for permutation in get_perm(spg, :R)
         f_op = linear_function_for_spatial_operation(permutation)
-        P_sol = find_subspace(T, P_sol, f_op; λ = reps[3], is_hermitian=false, _mapping_table=mt)
-        println("operation R, size(P_sol) = ", size(P_sol))
+        P_sol = find_subspace(T, P_sol, f_op; λ=reps[3], is_hermitian=false, tol=tol, _mapping_table=mt)
+        if verbose
+            println("operation R, size(P_sol) = ", size(P_sol))
+        end
     end
     return P_sol
 end

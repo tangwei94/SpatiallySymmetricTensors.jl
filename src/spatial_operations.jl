@@ -60,12 +60,14 @@ end
     - map the symmetric tensor to a vector that lives the linear space of the free parameters
 """
 function Base.vec(T::AbstractTensorMap; _mapping_table::MappingTable=mapping_table(T))
-    # FIXME. should return a vector instead of a view
-    v = map(eachindex(_mapping_table)) do ix
-        f1, f2, _, _ = _mapping_table[ix]
-        return vec(T[f1, f2])
+    num_paras = num_free_parameters(T; _mapping_table=_mapping_table)
+    v = Vector{eltype(T)}(undef, num_paras)
+    offset = 1
+    for (f1, f2, _, n) in _mapping_table
+        v[offset:offset+n-1] = vec(T[f1, f2])
+        offset += n
     end
-    return vcat(v...)
+    return v
 end
 
 """
@@ -78,14 +80,17 @@ returreturn
 """
 function selector(T::AbstractTensorMap, condition::Function; _mapping_table::MappingTable=mapping_table(T))
     num_paras = num_free_parameters(T; _mapping_table=_mapping_table)
-    P = zeros(ComplexF64, num_paras, num_paras)
-    Pd = view(P, diagind(P))
-
-    for ix in eachindex(_mapping_table)
-        f1, f2, a, n = _mapping_table[ix]
-        condition(f1, f2) && (Pd[a:a+n-1] .= 1)
+    indices = Int[]
+    for (f1, f2, a, n) in _mapping_table
+        if condition(f1, f2)
+            append!(indices, a:a+n-1)
+        end
     end
-    return P[:, Pd .== 1] 
+    P = zeros(ComplexF64, num_paras, length(indices))
+    for (j, idx) in enumerate(indices)
+        P[idx, j] = 1
+    end
+    return P
 end
 
 function linear_function_for_spatial_operation(permutation)

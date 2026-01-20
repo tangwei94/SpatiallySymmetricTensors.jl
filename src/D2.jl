@@ -11,6 +11,7 @@ const D2_σv2 = ((1, ), (2, 5, 4, 3))
 function get_reps(::D2, name::Symbol)
     (name == :A) && return D2_A_reps
     (name == :B1) && return D2_B1_reps
+    throw(ArgumentError("unknown representation name $(name) for D2"))
 end
 function get_perm(::D2, name::Symbol)
     (name == :σd) && return [] # empty diagonal reflections

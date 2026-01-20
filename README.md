@@ -32,7 +32,7 @@ Compared to a plain tensor, the SU(2)-symmetric tensor contains fewer free param
 Imposing spatial symmetries will further reduce the number of free parameters in the symmetric tensor.
 In our case, we want to look for the symmetric tensors that belong to the A1 representation of the point group C4v. 
 ```julia
-sols = find_solutions(C4v(), T0, :A1)
+sols = find_solution(C4v(), T0, :A1)
 ```
 The returned `sols` is a vector of linear independent symmetric tensors which (i) have the same internal symmetric structure as `T0` and (ii) belong to the A1 representation of C4v. 
 `sols` will contain only two entries, implying that we are left with only one free parameter after imposing the spatial symmetry. 
@@ -40,7 +40,7 @@ In the end, we can parametrize the PEPS tensor as, for example,
 ```julia
 function PEPS_tensor(x) 
     coefficients = [1.0, x]
-    return sum(coefficients .* sol)
+    return sum(coefficients .* sols)
 end
 ```
 where `x` is the free parameter.

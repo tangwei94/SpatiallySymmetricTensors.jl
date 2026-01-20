@@ -20,6 +20,7 @@ function get_reps(::C6v, name::Symbol)
     (name == :A2) && return C6v_A2_reps
     (name == :B1) && return C6v_B1_reps
     (name == :B2) && return C6v_B2_reps
+    throw(ArgumentError("unknown representation name $(name) for C6v"))
 end
 function get_perm(::C6v, name::Symbol)
     (name == :σd) && return [C6v_σd1, C6v_σd2, C6v_σd3] 

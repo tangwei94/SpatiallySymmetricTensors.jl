@@ -11,6 +11,7 @@ const C4_R2 = ((1, ), (5, 2, 3, 4))
 function get_reps(::C4, name::Symbol)
     (name == :A) && return C4_A_reps
     (name == :B) && return C4_B_reps
+    throw(ArgumentError("unknown representation name $(name) for C4"))
 end
 function get_perm(::C4, name::Symbol)
     (name == :σd) && return [] # empty diagonal reflections

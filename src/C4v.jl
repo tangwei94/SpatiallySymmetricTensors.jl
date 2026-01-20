@@ -18,6 +18,7 @@ function get_reps(::C4v, name::Symbol)
     (name == :A2) && return C4v_A2_reps
     (name == :B1) && return C4v_B1_reps
     (name == :B2) && return C4v_B2_reps
+    throw(ArgumentError("unknown representation name $(name) for C4v"))
 end
 function get_perm(::C4v, name::Symbol)
     (name == :σd) && return [C4v_σd1, C4v_σd2] 
