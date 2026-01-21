@@ -259,6 +259,26 @@ end
             end
         end
     end
+
+    # Also validate on actual TensorMap partners (Ax, Ay) returned by find_solution:
+    # permute([Ax Ay]) ≈ [Ax Ay] * D.
+    sols = find_solution(C4v(), T, :E)
+    @test length(sols) ≥ 2
+    Ax, Ay = sols[1], sols[2]
+
+    function check_E_doublet(Ax, Ay, perm, D; tol=1e-10)
+        lhs1, lhs2 = permute(Ax, perm), permute(Ay, perm)
+        rhs1 = Ax * D[1, 1] + Ay * D[2, 1]
+        rhs2 = Ax * D[1, 2] + Ay * D[2, 2]
+        return norm(lhs1 - rhs1) < tol && norm(lhs2 - rhs2) < tol
+    end
+
+    for (op, rep_list) in ops
+        perms = SpatiallySymmetricTensors.get_perm(C4v(), op)
+        for (perm, D) in zip(perms, rep_list)
+            @test check_E_doublet(Ax, Ay, perm, D)
+        end
+    end
 end
 
 @testset "C4v E irrep with U1GradedSpace" begin
