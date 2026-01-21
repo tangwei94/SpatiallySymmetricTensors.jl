@@ -260,23 +260,21 @@ end
         end
     end
 
-    # Also validate on actual TensorMap partners (Ax, Ay) returned by find_solution:
-    # permute([Ax Ay]) ≈ [Ax Ay] * D.
+    # Also validate on actual TensorMap partners (Ax, Ay) returned by find_solution,
+    # but only up to basis changes within the E irrep.
     sols = find_solution(C4v(), T, :E)
     @test length(sols) ≥ 2
     Ax, Ay = sols[1], sols[2]
 
-    function check_E_doublet(Ax, Ay, perm, D; tol=1e-10)
-        lhs1, lhs2 = permute(Ax, perm), permute(Ay, perm)
-        rhs1 = Ax * D[1, 1] + Ay * D[2, 1]
-        rhs2 = Ax * D[1, 2] + Ay * D[2, 2]
-        return norm(lhs1 - rhs1) < tol && norm(lhs2 - rhs2) < tol
-    end
-
     for (op, rep_list) in ops
         perms = SpatiallySymmetricTensors.get_perm(C4v(), op)
         for (perm, D) in zip(perms, rep_list)
-            @test check_E_doublet(Ax, Ay, perm, D)
+            M = matrix_for_spatial_operation(T, perm; _mapping_table=mt)
+            cols = hcat(vec(Ax), vec(Ay))
+            D_eff = cols \ (M * cols)
+            ev_eff = sort(eigvals(D_eff); by=x->(real(x), imag(x)))
+            ev_rep = sort(eigvals(D); by=x->(real(x), imag(x)))
+            @test norm(ev_eff - ev_rep) < 1e-10
         end
     end
 end

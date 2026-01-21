@@ -112,6 +112,26 @@ Convert a solution subspace `P_sol` into normalized symmetric tensor solutions.
 """
 function find_solution(T::AbstractTensorMap, P_sol::Matrix{<:Number}; _mapping_table::MappingTable=mapping_table(T))
     num_solutions = size(P_sol, 2)
-    sols = [set_data_by_vector(T, vec(P_sol[:, ix]); _mapping_table=_mapping_table) for ix in 1:num_solutions]
+    if num_solutions == 0
+        return Vector{typeof(T)}(undef, 0)
+    end
+    # Orthonormalize columns in order (modified Gram-Schmidt) to preserve block structure.
+    max_col_norm = maximum(norm(P_sol[:, ix]) for ix in 1:num_solutions)
+    tol = max_col_norm * sqrt(eps(real(eltype(P_sol))))
+    P_ortho = Matrix{eltype(P_sol)}(undef, size(P_sol, 1), 0)
+    for ix in 1:num_solutions
+        v = copy(P_sol[:, ix])
+        for jx in 1:size(P_ortho, 2)
+            v -= (P_ortho[:, jx]' * v) * P_ortho[:, jx]
+        end
+        nv = norm(v)
+        if nv > tol
+            P_ortho = hcat(P_ortho, v / nv)
+        end
+    end
+    if size(P_ortho, 2) == 0
+        return Vector{typeof(T)}(undef, 0)
+    end
+    sols = [set_data_by_vector(T, vec(P_ortho[:, ix]); _mapping_table=_mapping_table) for ix in 1:size(P_ortho, 2)]
     return [sol / norm(sol) for sol in sols]
 end
