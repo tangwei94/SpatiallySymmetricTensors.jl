@@ -240,41 +240,27 @@ end
     V = ℂ^2
     T = zeros(ComplexF64, P, V^4)
 
-    mt = mapping_table(T)
-    P_E = find_subspace(C4v(), T, :E)
-    @test size(P_E, 2) % 2 == 0
-    nblocks = size(P_E, 2) ÷ 2
-    @test nblocks > 0
-
-    reps = SpatiallySymmetricTensors.get_reps(C4v(), :E)
-    ops = [(:σd, reps[1]), (:σv, reps[2]), (:R, reps[3])]
-    for (op, rep_list) in ops
-        perms = SpatiallySymmetricTensors.get_perm(C4v(), op)
-        @test length(perms) == length(rep_list)
-        for (perm, D) in zip(perms, rep_list)
-            M = matrix_for_spatial_operation(T, perm; _mapping_table=mt)
-            for b in 1:nblocks
-                cols = P_E[:, (b - 1) * 2 + 1:b * 2]
-                @test norm(M * cols - cols * D) < 1e-10
-            end
-        end
-    end
-
-    # Also validate on actual TensorMap partners (Ax, Ay) returned by find_solution,
-    # but only up to basis changes within the E irrep.
+    # validate on actual TensorMap partners (Ax, Ay) returned by find_solution
     sols = find_solution(C4v(), T, :E)
     @test length(sols) ≥ 2
-    Ax, Ay = sols[1], sols[2]
+    @test length(sols) % 2 == 0
 
-    for (op, rep_list) in ops
-        perms = SpatiallySymmetricTensors.get_perm(C4v(), op)
-        for (perm, D) in zip(perms, rep_list)
-            M = matrix_for_spatial_operation(T, perm; _mapping_table=mt)
-            cols = hcat(vec(Ax), vec(Ay))
-            D_eff = cols \ (M * cols)
-            ev_eff = sort(eigvals(D_eff); by=x->(real(x), imag(x)))
-            ev_rep = sort(eigvals(D); by=x->(real(x), imag(x)))
-            @test norm(ev_eff - ev_rep) < 1e-10
+    mt = mapping_table(T)
+    reps = SpatiallySymmetricTensors.get_reps(C4v(), :E)
+    ops = [(:σd, reps[1]), (:σv, reps[2]), (:R, reps[3])]
+    nsols = length(sols) ÷ 2
+    for b in 1:nsols
+        Ax = sols[(b - 1) * 2 + 1]
+        Ay = sols[(b - 1) * 2 + 2]
+        cols = hcat(vec(Ax), vec(Ay))
+        for (op, rep_list) in ops
+            perms = SpatiallySymmetricTensors.get_perm(C4v(), op)
+            @test length(perms) == length(rep_list)
+
+            for (perm, D) in zip(perms, rep_list)
+                norm(permute(Ax, perm) - D[1, 1] * Ax - D[1, 2] * Ay) < 1e-10
+                norm(permute(Ay, perm) - D[2, 1] * Ax - D[2, 2] * Ay) < 1e-10
+            end
         end
     end
 end

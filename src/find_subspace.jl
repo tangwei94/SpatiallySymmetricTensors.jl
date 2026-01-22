@@ -95,7 +95,7 @@ function find_subspace_matrixrep(T::AbstractTensorMap, P_init::Matrix{<:Number},
         println("input subspace is empty")
         return P_init
     end
-    if num_paras != size(P_init, 1) * d_irrep
+    if size(P_init, 1) != num_paras * d_irrep
         throw(ArgumentError("P_init should have $(num_paras)*$(d_irrep) rows"))
     end
     if size(D, 1) != size(D, 2)
@@ -110,14 +110,14 @@ function find_subspace_matrixrep(T::AbstractTensorMap, P_init::Matrix{<:Number},
 
     K = zeros(Tprom, num_paras*d_irrep, num_sol_init*d_irrep)
     for ix in 1:d_irrep
-        indices_L = (ix-1)*num_paras+(1:num_paras)
-        indices_R = (ix-1)*num_sol_init+(1:num_sol_init)
+        indices_L = (ix-1)*num_paras .+ (1:num_paras)
+        indices_R = (ix-1)*num_sol_init .+ (1:num_sol_init)
         K[indices_L, indices_R] = P_init[indices_L, :]
     end
     K .= - kron(transpose(D), I_paras) * K
     for ix in 1:d_irrep
-        indices_L = (ix-1)*num_paras+(1:num_paras)
-        indices_R = (ix-1)*num_sol_init+(1:num_sol_init)
+        indices_L = (ix-1)*num_paras .+ (1:num_paras)
+        indices_R = (ix-1)*num_sol_init .+ (1:num_sol_init)
         K[indices_L, indices_R] .+= M_op * P_init[indices_L, :]
     end
     
