@@ -4,6 +4,37 @@ Abstract point group type for spatial symmetry operations.
 abstract type AbstractPointGroup end
 
 """
+    projector_function(spg::AbstractPointGroup, reps_name::Symbol)
+
+Return a function that applies the irrep projector to a tensor by summing
+over the point-group permutations with their characters.
+"""
+function projector_function(spg::AbstractPointGroup, reps_name::Symbol)
+    reps = get_reps(spg, reps_name)
+    op_names = (:σd, :σv, :R)
+
+    perms_with_char = Tuple{Any, ComplexF64}[]
+    for (i, name) in enumerate(op_names)
+        χ = reps[i]
+        χ == 0 && continue
+        for perm in get_perm(spg, name)
+            push!(perms_with_char, (perm, ComplexF64(χ)))
+        end
+    end
+    isempty(perms_with_char) && throw(ArgumentError("no permutations found for $(spg)"))
+
+    norm_factor = 1.0 / length(perms_with_char)
+
+    return function (T)
+        acc = zero(T)
+        for (perm, χ) in perms_with_char
+            acc += conj(χ) * permute(T, perm)
+        end
+        return norm_factor * acc
+    end
+end
+
+"""
     find_subspace(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing, verbose=false, tol=1e-8)
 
 Find the subspace of `T` transforming under the representation `reps_name` of `spg`.
