@@ -146,11 +146,30 @@ function find_solution(T::AbstractTensorMap, P_sol::Matrix{<:Number}; _mapping_t
     if num_solutions == 0
         return Vector{typeof(T)}(undef, 0)
     end
-    F = qr(P_sol)
-    P_ortho = Matrix(F.Q)
-    if size(P_ortho, 2) == 0
-        return Vector{typeof(T)}(undef, 0)
+    num_paras = num_free_parameters(T; _mapping_table=_mapping_table)
+    nrows = size(P_sol, 1)
+    if nrows == num_paras
+        F = qr(P_sol)
+        P_ortho = Matrix(F.Q)[:, 1:num_solutions]
+        sols = [set_data_by_vector(T, vec(P_ortho[:, ix]); _mapping_table=_mapping_table) for ix in 1:num_solutions]
+        return [sol / norm(sol) for sol in sols]
+    elseif nrows % num_paras == 0
+        d_irrep = nrows ÷ num_paras
+        F = qr(P_sol)
+        P_ortho = Matrix(F.Q)[:, 1:num_solutions]
+        sols = Vector{typeof(T)}(undef, num_solutions * d_irrep)
+        idx = 1
+        for ix in 1:num_solutions
+            v = P_ortho[:, ix]
+            for jx in 1:d_irrep
+                block = v[(jx - 1) * num_paras + 1: jx * num_paras]
+                sol = set_data_by_vector(T, vec(block); _mapping_table=_mapping_table)
+                sols[idx] = sol / norm(sol)
+                idx += 1
+            end
+        end
+        return sols
+    else
+        throw(ArgumentError("P_sol has $(nrows) rows, which is not compatible with num_free_parameters(T)=$(num_paras)"))
     end
-    sols = [set_data_by_vector(T, vec(P_ortho[:, ix]); _mapping_table=_mapping_table) for ix in 1:size(P_ortho, 2)]
-    return [sol / norm(sol) for sol in sols]
 end
