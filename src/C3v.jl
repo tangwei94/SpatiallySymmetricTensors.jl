@@ -11,11 +11,31 @@ const C3v_σv3 = ((1, ), (4, 3, 2))
 const C3v_A1_reps = (0, 1, 1)
 const C3v_A2_reps = (0, -1, 1)
 
+"""
+    get_reps(::C3v, name::Symbol)
+
+Return the representation data for `name` in the `C3v` point group.
+
+Notes:
+- Supported names are `:A1` and `:A2`.
+- The return value is a tuple `(σd, σv, R)` where `σd` is unused for `C3v`
+  (set to 0 by convention), `σv` are reflection eigenvalues, and `R` are
+  rotation eigenvalues.
+"""
 function get_reps(::C3v, name::Symbol)
     (name == :A1) && return C3v_A1_reps
     (name == :A2) && return C3v_A2_reps
     throw(ArgumentError("unknown representation name $(name) for C3v"))
 end
+"""
+    get_perm(::C3v, name::Symbol)
+
+Return the list of spatial permutations for the operation family `name`.
+
+Notes:
+- Supported names are `:σd`, `:σv`, and `:R`.
+- `:σd` is empty for `C3v` by convention.
+"""
 function get_perm(::C3v, name::Symbol)
     (name == :σd) && return [] # empty diagonal reflections
     (name == :σv) && return [C3v_σv1, C3v_σv2, C3v_σv3]

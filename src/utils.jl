@@ -4,6 +4,12 @@ const MPOTensor{T,S} = AbstractTensorMap{T,S,2,2} where {T,S}
     mpo_ovlp(A1, A2)
 
 Return the dominant eigenpair of the MPO overlap transfer operator.
+
+Notes:
+- Constructs the transfer map using contraction of `A1` with `conj(A2)`.
+- Uses `KrylovKit.eigsolve` with a random initial vector; results can depend
+  on the seed if the dominant eigenvalue is degenerate.
+- Returns `(eigenvalues, eigenvectors)` as in `eigsolve`.
 """
 function mpo_ovlp(A1, A2)
     V1 = space(A1, 1)
@@ -22,6 +28,11 @@ end
     mpotensor_dag(T::MPOTensor)
 
 Return the Hermitian conjugate of an MPO tensor.
+
+Notes:
+- The data is conjugated and the physical legs are swapped to implement the
+  Hermitian adjoint at the tensor level.
+- The returned tensor uses the same `space(T)` metadata as the input.
 """
 function mpotensor_dag(T::MPOTensor)
     T_data = reshape(T.data, (dims(codomain(T))..., dims(domain(T))...))
@@ -34,6 +45,11 @@ end
     mpo_hermicity(A)
 
 Return a norm ratio diagnosing Hermiticity of MPO `A`.
+
+Notes:
+- Computes dominant eigenvalues of `A * A†` and `A * A` transfer operators.
+- The ratio is 1 for exact Hermiticity (up to numerical error).
+- Uses a random initial vector for `eigsolve`.
 """
 function mpo_hermicity(A)
     v_space = space(A, 1)
@@ -62,6 +78,11 @@ end
     mpo_normality(A)
 
 Return a norm ratio diagnosing normality of MPO `A`.
+
+Notes:
+- Compares dominant eigenvalues of `A† A A† A` and `A† A A A†` transfer maps.
+- The ratio is 1 for exact normality (up to numerical error).
+- Uses a random initial vector for `eigsolve`.
 """
 function mpo_normality(A)
     v_space = space(A, 1)

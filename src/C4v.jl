@@ -23,6 +23,16 @@ const C4v_E_R1 = [0 -1; 1 0]
 const C4v_E_R2 = [0 1; -1 0]
 const C4v_E_reps = ([C4v_E_σd1, C4v_E_σd2], [C4v_E_σv1, C4v_E_σv2], [C4v_E_R1, C4v_E_R2])
 
+"""
+    get_reps(::C4v, name::Symbol)
+
+Return the representation data for `name` in the `C4v` point group.
+
+Notes:
+- Supported names are `:A1`, `:A2`, `:B1`, `:B2`, and `:E`.
+- The return value is a tuple `(σd, σv, R)` where each entry is either a scalar
+  eigenvalue or a list of matrices for the 2D irrep `:E`.
+"""
 function get_reps(::C4v, name::Symbol)
     (name == :A1) && return C4v_A1_reps
     (name == :A2) && return C4v_A2_reps
@@ -31,6 +41,15 @@ function get_reps(::C4v, name::Symbol)
     (name == :E) && return C4v_E_reps
     throw(ArgumentError("unknown representation name $(name) for C4v"))
 end
+"""
+    get_perm(::C4v, name::Symbol)
+
+Return the list of spatial permutations for the operation family `name`.
+
+Notes:
+- Supported names are `:σd`, `:σv`, and `:R`.
+- The permutations follow the leg ordering convention used by `permute`.
+"""
 function get_perm(::C4v, name::Symbol)
     (name == :σd) && return [C4v_σd1, C4v_σd2] 
     (name == :σv) && return [C4v_σv1, C4v_σv2]

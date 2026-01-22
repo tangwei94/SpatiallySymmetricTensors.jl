@@ -16,6 +16,15 @@ const C6v_A2_reps = (-1, -1, 1)
 const C6v_B1_reps = (-1, 1, -1) 
 const C6v_B2_reps = (1, -1, -1) 
 
+"""
+    get_reps(::C6v, name::Symbol)
+
+Return the representation data for `name` in the `C6v` point group.
+
+Notes:
+- Supported names are `:A1`, `:A2`, `:B1`, and `:B2`.
+- The return value is a tuple `(σd, σv, R)` of scalar eigenvalues.
+"""
 function get_reps(::C6v, name::Symbol)
     (name == :A1) && return C6v_A1_reps
     (name == :A2) && return C6v_A2_reps
@@ -23,6 +32,15 @@ function get_reps(::C6v, name::Symbol)
     (name == :B2) && return C6v_B2_reps
     throw(ArgumentError("unknown representation name $(name) for C6v"))
 end
+"""
+    get_perm(::C6v, name::Symbol)
+
+Return the list of spatial permutations for the operation family `name`.
+
+Notes:
+- Supported names are `:σd`, `:σv`, and `:R`.
+- The permutations follow the leg ordering convention used by `permute`.
+"""
 function get_perm(::C6v, name::Symbol)
     (name == :σd) && return [C6v_σd1, C6v_σd2, C6v_σd3] 
     (name == :σv) && return [C6v_σv1, C6v_σv2, C6v_σv3]
