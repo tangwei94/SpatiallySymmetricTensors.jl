@@ -73,16 +73,15 @@ end
     find_subspace_matrixrep(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function, D::AbstractMatrix;
         tol=1e-8, _mapping_table=mapping_table(T))
 
-FIXME. docstring for this function is outdated. need to be updated!
-
 Project `P_init` onto the subspace transforming as matrix representation `D` under `f_op`.
 Returns a basis matrix for the resulting subspace.
 
 Notes:
-- `P_init` columns are an initial basis in parameter space.
-- Solves `(I ⊗ M_op) vec(X) - (D^T ⊗ I) vec(X) = 0 ` by looking for the null space of the LHS
-- The result is a (not necessarily orthonormal) basis in the original parameter
-  space.
+- `P_init` should have `num_paras * d_irrep` rows, i.e. it is a vertical stacking
+  of `d_irrep` copies of parameter space.
+- Solves `(I ⊗ M_op) vec(X) - (D^T ⊗ I) vec(X) = 0` by looking for the null space
+  of the left-hand side.
+- The result is a (not necessarily orthonormal) basis in the stacked parameter space.
 """
 function find_subspace_matrixrep(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function, D::AbstractMatrix;
     tol::Real=1e-8, _mapping_table::MappingTable=mapping_table(T))
@@ -137,9 +136,18 @@ end
 Convert a solution subspace `P_sol` into normalized symmetric tensor solutions.
 
 Notes:
-- Columns of `P_sol` are interpreted as parameter vectors.
-- Uses modified Gram-Schmidt to preserve the original block structure ordering.
-- Each returned tensor is normalized by its Frobenius norm.
+- For 1D irreps, `P_sol` has `num_paras` rows and each column yields one tensor.
+- For higher-dimensional irreps, `P_sol` has `d_irrep * num_paras` rows and each
+  column is split into `d_irrep` consecutive blocks, each of length `num_paras`,
+  producing `d_irrep` tensors from that column.
+- The return value is a flat `Vector{Tensor}`. Here:
+  a "column" means one basis vector in `P_sol` (one solution in parameter space),
+  and a "block" means one of the `d_irrep` consecutive `num_paras`-length slices
+  of that column. Ordering is:
+  column 1 block 1, column 1 block 2, ..., column 1 block d_irrep,
+  then column 2 block 1, ..., column 2 block d_irrep, etc.
+- The columns are orthonormalized via QR; each returned tensor is normalized by
+  its Frobenius norm.
 """
 function find_solution(T::AbstractTensorMap, P_sol::Matrix{<:Number}; _mapping_table::MappingTable=mapping_table(T))
     num_solutions = size(P_sol, 2)
