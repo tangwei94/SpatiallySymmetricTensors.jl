@@ -27,9 +27,32 @@ end
     end
 end
 
+@testset "projector_function C4 C4v, U1Space" begin
+    V = U1Space(-1=>1, 0=>1, 1=>1)
+    P = U1Space(0=>1, 1=>1, 2=>1)
+
+    for (group, irrep_name) in [
+        (C4v(), :A1), (C4v(), :A2), (C4v(), :B1), (C4v(), :B2),
+        (C4(), :A), (C4(), :B),
+    ]
+        _check_projector(group, irrep_name, rand(ComplexF64, P, V^4))
+    end
+end
+
 @testset "projector_function C3v, SU2Space" begin
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
+
+    for (group, irrep_name) in [
+        (C3v(), :A1), (C3v(), :A2),
+    ]
+        _check_projector(group, irrep_name, rand(ComplexF64, P, V^3))
+    end
+end
+
+@testset "projector_function C3v, U1Space" begin
+    V = U1Space(-1=>1, 0=>1, 1=>1)
+    P = U1Space(0=>1, 1=>1, 2=>1)
 
     for (group, irrep_name) in [
         (C3v(), :A1), (C3v(), :A2),
@@ -49,9 +72,31 @@ end
     end
 end
 
+@testset "projector_function C6v, U1Space" begin
+    V = U1Space(-1=>1, 0=>1, 1=>1)
+    P = U1Space(0=>1, 1=>1, 2=>1)
+
+    for (group, irrep_name) in [
+        (C6v(), :A1), (C6v(), :A2), (C6v(), :B1), (C6v(), :B2),
+    ]
+        _check_projector(group, irrep_name, rand(ComplexF64, P, V^6))
+    end
+end
+
 @testset "projector_function D2, SU2Space" begin
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
+
+    for (group, irrep_name) in [
+        (D2(), :A), (D2(), :B1), (D2(), :B2), (D2(), :B3),
+    ]
+        _check_projector(group, irrep_name, rand(ComplexF64, P, V^4))
+    end
+end
+
+@testset "projector_function D2, U1Space" begin
+    V = U1Space(-1=>1, 0=>1, 1=>1)
+    P = U1Space(0=>1, 1=>1, 2=>1)
 
     for (group, irrep_name) in [
         (D2(), :A), (D2(), :B1), (D2(), :B2), (D2(), :B3),
