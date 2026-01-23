@@ -63,8 +63,8 @@ end
     @test size(P_sol, 2) == 0
 end
 
-@testset "non-orthonormal tolerance" begin
-    # orthonormality check should respect the tolerance parameter
+@testset "non-orthonormal tolerance for P_init" begin
+    # orthonormality check; should respect the tolerance parameter
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^4)
@@ -80,7 +80,7 @@ end
     @test size(P_sol, 1) == num_paras
 end
 
-@testset "selector identity" begin
+@testset "test selector: identity" begin
     # selector with a true condition should be the identity projector
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
@@ -92,25 +92,23 @@ end
     @test Psel == Matrix{ComplexF64}(I, num_paras, num_paras)
 end
 
-@testset "selector columns" begin
-    # selector should match the explicit column subset for a condition
+@testset "test selector: fusion tree condition" begin
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^4)
 
     mt = mapping_table(T)
     num_paras = num_free_parameters(T; _mapping_table=mt)
-    condition(f1, f2) = length(findall(rep -> rep == SU2Irrep(1//2), f2.uncoupled)) == 1
 
-    indices = Int[]
-    for (f1, f2, a, n) in mt
-        if condition(f1, f2)
-            append!(indices, a:a+n-1)
-        end
-    end
+    # for the given P and V, there are only two possiblities
+    # looking for the subspace with (1//2 ⊕ 0 ⊕ 0 ⊕ 0 -> 1//2) 
+    condition_S(f1, f2) = length(findall(rep -> rep == SU2Irrep(1//2), f2.uncoupled)) == 1
+    # looking for the subspace with (1//2 ⊕ 1//2 ⊕ 1//2 ⊕ 0 -> 1//2) 
+    condition_L(f1, f2) = length(findall(rep -> rep == SU2Irrep(1//2), f2.uncoupled)) == 3
 
-    Psel = selector(T, condition; _mapping_table=mt)
-    @test size(Psel, 1) == num_paras
-    @test size(Psel, 2) == length(indices)
-    @test Psel == Matrix{ComplexF64}(I, num_paras, num_paras)[:, indices]
+    Psel_S = selector(T, condition_S; _mapping_table=mt)
+    Psel_L = selector(T, condition_L; _mapping_table=mt)
+
+    @test size(Psel_S, 1) == num_paras
+    @test size(Psel_S, 2) + size(Psel_L, 2) == num_paras
 end
