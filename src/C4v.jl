@@ -84,6 +84,7 @@ function split_multiplets(::C4v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{
 
     f_R = linear_function_for_spatial_operation(C4v_ops[:R1])
     mat_R = matrix_for_linear_function(T, f_R; _mapping_table=mt)
+
     rep_R = irrep_rep(C4v(), :E)[:R1]
     Λ, Q = eigen( Hermitian(-im * rep_R) )
 
@@ -95,6 +96,7 @@ function split_multiplets(::C4v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{
     end
 
     P_sol_a = Matrix(qr(P_1 * Q[1, 1] + P_2 * Q[2, 1]).Q)
+
     P_sol_b = mat_R * P_sol_a
 
     return P_sol_a, P_sol_b

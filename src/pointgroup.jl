@@ -77,8 +77,6 @@ function projector_function(spg::AbstractPointGroup, reps_name::Symbol)
     end
 end
 
-
-
 """
     find_subspace(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing, verbose=false, tol=1e-8)
 
@@ -100,6 +98,14 @@ end
 Return normalized tensor solutions transforming under `reps_name` of `spg`.
 """
 function find_solution(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing)
-    P_sol = find_subspace(spg, T, reps_name; P_filter=P_filter)
-    return find_solution(T, P_sol)
+    if irrep_dim(spg, reps_name) == 1
+        P_sol = find_subspace(spg, T, reps_name; P_filter=P_filter)
+        return find_solution(T, P_sol)
+    end
+    
+    if irrep_dim(spg, reps_name) > 1
+        P_sol_mixed = find_subspace(spg, T, reps_name; P_filter=P_filter)
+        P_sol_multiplets = split_multiplets(spg, T, Val(reps_name), P_sol_mixed)
+        return vcat(find_solution.(Ref(T), P_sol_multiplets)...)
+    end
 end
