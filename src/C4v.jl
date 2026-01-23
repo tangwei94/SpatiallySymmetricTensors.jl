@@ -71,6 +71,13 @@ irrep_rep(::C4v, ::Val{:B1}) = Dict(name => [χ;;] for (name, χ) in C4v_B1_reps
 irrep_rep(::C4v, ::Val{:B2}) = Dict(name => [χ;;] for (name, χ) in C4v_B2_reps)
 irrep_rep(::C4v, ::Val{:E}) = C4v_E_rep
 
+"""
+    split_multiplets(::C4v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{<:Number}; _mapping_table=mapping_table(T))
+
+Split the E-irrep subspace `P_sol` into two multiplet components using the
+eigenspaces of `-im * R1` and the C4v E-representation basis.
+Returns a pair `(P_sol_a, P_sol_b)` with `P_sol_b = R1 * P_sol_a`.
+"""
 function split_multiplets(::C4v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{<:Number}; _mapping_table::MappingTable=mapping_table(T))
 
     mt = _mapping_table
@@ -91,5 +98,4 @@ function split_multiplets(::C4v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{
     P_sol_b = mat_R * P_sol_a
 
     return P_sol_a, P_sol_b
-
 end
