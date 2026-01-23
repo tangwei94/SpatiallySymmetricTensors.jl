@@ -25,6 +25,7 @@ end
         T1, T2 = T_sol[ix], T_sol[ix+nsol]
         for (gname, gperm) in C4v_ops
             rep_g = C4v_E_rep[gname]
+            # [g(T1), g(T2)] =[T1 T2] * rep_g
             @test norm(T1 * rep_g[1, 1] + T2 * rep_g[2, 1] - permute(T1, gperm)) < 1e-10
             @test norm(T1 * rep_g[1, 2] + T2 * rep_g[2, 2] - permute(T2, gperm)) < 1e-10
         end

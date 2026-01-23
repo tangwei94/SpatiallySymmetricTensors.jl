@@ -40,6 +40,6 @@ end
 
 Project `P_init` onto the charge-conjugation eigenspace with eigenvalue `λ`.
 """
-function find_subspace_for_u1_charge_conjugation(T::AbstractTensorMap{N, U1GradedSpace}, P_init::Matrix{<:Number}; λ::Real=1.0, _mapping_table::MappingTable=mapping_table(T)) where N
+function find_subspace_for_u1_charge_conjugation(T::AbstractTensorMap{N, U1GradedSpace}, P_init::Matrix{<:Number}; λ::Number=1.0, _mapping_table::MappingTable=mapping_table(T)) where N
     return find_subspace(T, P_init, u1_charge_conjugation; λ=λ, _mapping_table=_mapping_table)
 end
