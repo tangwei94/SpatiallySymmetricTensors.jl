@@ -18,6 +18,42 @@ function matrix_for_linear_function(T::AbstractTensorMap, f_op::Function; _mappi
 end
 
 """
+    find_subspace_from_projector(T::AbstractTensorMap, f_proj::Function; P_filter=nothing, tol=1e-8, _mapping_table=mapping_table(T))
+
+Construct a symmetry subspace by QR-decomposing the projector matrix.
+"""
+function find_subspace_from_projector(T::AbstractTensorMap, f_proj::Function; P_filter=nothing, tol::Real=1e-8, _mapping_table::MappingTable=mapping_table(T))
+    num_paras = num_free_parameters(T; _mapping_table=_mapping_table)
+    if isnothing(P_filter)
+        P_filter = Matrix{ComplexF64}(I, num_paras, num_paras)
+    end
+
+    init_subspace_size = size(P_filter, 2)
+    if init_subspace_size == 0
+        @warn "input subspace is empty, returning empty subspace"
+        return P_filter
+    end
+
+    if norm(P_filter' * P_filter - Matrix{eltype(P_filter)}(I, init_subspace_size, init_subspace_size)) > tol
+        throw(ArgumentError("input subspace is not orthonormal"))
+    end
+
+    M_op = matrix_for_linear_function(T, f_proj; _mapping_table=_mapping_table)
+    M_sub = P_filter' * M_op * P_filter
+
+    F = qr(M_sub)
+    R = F.R
+    keep = findall(abs.(diag(R)) .> tol)
+    if isempty(keep)
+        @warn "output subspace is empty, returning empty subspace"
+        return P_filter[:, 1:0]
+    end
+
+    Q = Matrix(F.Q)
+    return P_filter * Q[:, keep]
+end
+
+"""
     find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function; λ=1.0, is_hermitian=false, tol=1e-8, _mapping_table=mapping_table(T))
 
 Project an initial subspace `P_init` onto the eigenspace of `f_op` with eigenvalue `λ`.
@@ -32,12 +68,6 @@ function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Fun
     end
 
     if norm(P_init' * P_init - Matrix{eltype(P_init)}(I, init_subspace_size, init_subspace_size)) > tol
-        #for ix in 1:init_subspace_size
-        #    for iy in 1:init_subspace_size
-        #        print(" ", (P_init' * P_init)[ix, iy], " ")
-        #    end
-        #    println(" ")
-        #end
         error("input subspace is not orthonormal")
     end
 

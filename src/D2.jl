@@ -1,22 +1,28 @@
-"""D2 point group (two reflections)."""
+"""D2 point group (two reflections and a 180 degree rotation)."""
 struct D2 <: AbstractPointGroup end
 
-# in the order of σd, σv, R; see http://symmetry.jacobs-university.de/cgi-bin/group.cgi?group=302&option=4
-# ignore representation of σd for D2
-const D2_A_reps = (0, 1, 1) 
-const D2_B1_reps = (0, -1, 1)
+const D2_perm_type = Tuple{Tuple{Int}, NTuple{4, Int}}
+const D2_ops = Dict{Symbol, D2_perm_type}(
+    :Id => ((1, ), (2, 3, 4, 5)),
+    :σv1 => ((1, ), (4, 3, 2, 5)),
+    :σv2 => ((1, ), (2, 5, 4, 3)),
+    :C2 => ((1, ), (4, 5, 2, 3)),
+)
+const D2_A_reps = Dict{Symbol, Int}(
+    :Id => 1, :σv1 => 1, :σv2 => 1, :C2 => 1,
+)
+const D2_B1_reps = Dict{Symbol, Int}(
+    :Id => 1, :σv1 => -1, :σv2 => -1, :C2 => 1,
+)
+const D2_B2_reps = Dict{Symbol, Int}(
+    :Id => 1, :σv1 => 1, :σv2 => -1, :C2 => -1,
+)
+const D2_B3_reps = Dict{Symbol, Int}(
+    :Id => 1, :σv1 => -1, :σv2 => 1, :C2 => -1,
+)
 
-const D2_σv1 = ((1, ), (4, 3, 2, 5))
-const D2_σv2 = ((1, ), (2, 5, 4, 3))
-
-function get_reps(::D2, name::Symbol)
-    (name == :A) && return D2_A_reps
-    (name == :B1) && return D2_B1_reps
-    throw(ArgumentError("unknown representation name $(name) for D2"))
-end
-function get_perm(::D2, name::Symbol)
-    (name == :σd) && return [] # empty diagonal reflections
-    (name == :σv) && return [D2_σv1, D2_σv2]
-    (name == :R) && return [] # empty rotations
-    throw(ArgumentError("unknown operation name $(name) for D2"))
-end
+group_elements(::D2) = D2_ops
+irrep_chars(::D2, ::Val{:A}) = D2_A_reps
+irrep_chars(::D2, ::Val{:B1}) = D2_B1_reps
+irrep_chars(::D2, ::Val{:B2}) = D2_B2_reps
+irrep_chars(::D2, ::Val{:B3}) = D2_B3_reps

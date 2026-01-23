@@ -1,31 +1,49 @@
 """C6v point group (hexagonal lattice with reflections and rotations)."""
 struct C6v <: AbstractPointGroup end
 
-const C6v_R1 = ((1, ), (3, 4, 5, 6, 7, 2))
-const C6v_R2 = ((1, ), (7, 2, 3, 4, 5, 6))
-const C6v_σd1 = ((1, ), (7, 6, 5, 4, 3, 2))
-const C6v_σd2 = ((1, ), (3, 2, 7, 6, 5, 4))
-const C6v_σd3 = ((1, ), (5, 4, 3, 2, 7, 6))
-const C6v_σv1 = ((1, ), (6, 5, 4, 3, 2, 7))
-const C6v_σv2 = ((1, ), (2, 7, 6, 5, 4, 3))
-const C6v_σv3 = ((1, ), (4, 3, 2, 7, 6, 5))
+const C6v_perm_type = Tuple{Tuple{Int}, NTuple{6, Int}}
+const C6v_ops = Dict{Symbol, C6v_perm_type}(
+    :Id => ((1, ), (2, 3, 4, 5, 6, 7)),
+    :R1 => ((1, ), (3, 4, 5, 6, 7, 2)),
+    :R2 => ((1, ), (4, 5, 6, 7, 2, 3)),
+    :C2 => ((1, ), (5, 6, 7, 2, 3, 4)),
+    :R4 => ((1, ), (6, 7, 2, 3, 4, 5)),
+    :R5 => ((1, ), (7, 2, 3, 4, 5, 6)),
+    :σd1 => ((1, ), (7, 6, 5, 4, 3, 2)),
+    :σd2 => ((1, ), (3, 2, 7, 6, 5, 4)),
+    :σd3 => ((1, ), (5, 4, 3, 2, 7, 6)),
+    :σv1 => ((1, ), (6, 5, 4, 3, 2, 7)),
+    :σv2 => ((1, ), (2, 7, 6, 5, 4, 3)),
+    :σv3 => ((1, ), (4, 3, 2, 7, 6, 5)),
+)
 
-# in the order of σd, σv, R; see http://symmetry.jacobs-university.de/cgi-bin/group.cgi?group=406&option=4
-const C6v_A1_reps = (1, 1, 1) 
-const C6v_A2_reps = (-1, -1, 1) 
-const C6v_B1_reps = (-1, 1, -1) 
-const C6v_B2_reps = (1, -1, -1) 
+const C6v_A1_reps = Dict{Symbol, Int}(
+    :Id => 1,
+    :σd1 => 1, :σd2 => 1, :σd3 => 1,
+    :σv1 => 1, :σv2 => 1, :σv3 => 1,
+    :R1 => 1, :R2 => 1, :C2 => 1, :R4 => 1, :R5 => 1,
+)
+const C6v_A2_reps = Dict{Symbol, Int}(
+    :Id => 1,
+    :σd1 => -1, :σd2 => -1, :σd3 => -1,
+    :σv1 => -1, :σv2 => -1, :σv3 => -1,
+    :R1 => 1, :R2 => 1, :C2 => 1, :R4 => 1, :R5 => 1,
+)
+const C6v_B1_reps = Dict{Symbol, Int}(
+    :Id => 1,
+    :σd1 => -1, :σd2 => -1, :σd3 => -1,
+    :σv1 => 1, :σv2 => 1, :σv3 => 1,
+    :R1 => -1, :R2 => 1, :C2 => -1, :R4 => 1, :R5 => -1,
+)
+const C6v_B2_reps = Dict{Symbol, Int}(
+    :Id => 1,
+    :σd1 => 1, :σd2 => 1, :σd3 => 1,
+    :σv1 => -1, :σv2 => -1, :σv3 => -1,
+    :R1 => -1, :R2 => 1, :C2 => -1, :R4 => 1, :R5 => -1,
+)
 
-function get_reps(::C6v, name::Symbol)
-    (name == :A1) && return C6v_A1_reps
-    (name == :A2) && return C6v_A2_reps
-    (name == :B1) && return C6v_B1_reps
-    (name == :B2) && return C6v_B2_reps
-    throw(ArgumentError("unknown representation name $(name) for C6v"))
-end
-function get_perm(::C6v, name::Symbol)
-    (name == :σd) && return [C6v_σd1, C6v_σd2, C6v_σd3] 
-    (name == :σv) && return [C6v_σv1, C6v_σv2, C6v_σv3]
-    (name == :R) && return [C6v_R1, C6v_R2]
-    throw(ArgumentError("unknown operation name $(name) for C6v"))
-end
+group_elements(::C6v) = C6v_ops
+irrep_chars(::C6v, ::Val{:A1}) = C6v_A1_reps
+irrep_chars(::C6v, ::Val{:A2}) = C6v_A2_reps
+irrep_chars(::C6v, ::Val{:B1}) = C6v_B1_reps
+irrep_chars(::C6v, ::Val{:B2}) = C6v_B2_reps
