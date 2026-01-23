@@ -6,8 +6,7 @@ abstract type AbstractPointGroup end
 """
     projector_function(spg::AbstractPointGroup, reps_name::Symbol)
 
-Return a function that applies the irrep projector to a tensor by summing
-over the point-group permutations with their characters.
+Return a function that applies the irrep projector:  P = d_reps / |G| ∑_{g ∈ G} conj(χ)(g) ρ(g)
 """
 function projector_function(spg::AbstractPointGroup, reps_name::Symbol)
     reps = get_reps(spg, reps_name)
@@ -18,7 +17,7 @@ function projector_function(spg::AbstractPointGroup, reps_name::Symbol)
         χ = reps[i]
         χ == 0 && continue
         for perm in get_perm(spg, name)
-            push!(perms_with_char, (perm, ComplexF64(χ)))
+            push!(perms_with_char, (perm, χ))
         end
     end
     isempty(perms_with_char) && throw(ArgumentError("no permutations found for $(spg)"))

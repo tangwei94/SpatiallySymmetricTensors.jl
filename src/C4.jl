@@ -1,22 +1,16 @@
 """C4 point group (rotations only)."""
 struct C4 <: AbstractPointGroup end
 
-# in the order of σd, σv, R; see http://symmetry.jacobs-university.de/cgi-bin/group.cgi?group=204&option=4
-# ignore representationq of σd and σv for C4
-const C4_A_reps = (0, 0, 1) 
-const C4_B_reps = (0, 0, -1) 
-
-const C4_R1 = ((1, ), (3, 4, 5, 2))
-const C4_R2 = ((1, ), (5, 2, 3, 4))
-
-function get_reps(::C4, name::Symbol)
-    (name == :A) && return C4_A_reps
-    (name == :B) && return C4_B_reps
-    throw(ArgumentError("unknown representation name $(name) for C4"))
-end
-function get_perm(::C4, name::Symbol)
-    (name == :σd) && return [] # empty diagonal reflections
-    (name == :σv) && return [] # empty horizontal and vertical reflections
-    (name == :R) && return [C4_R1, C4_R2]
-    throw(ArgumentError("unknown operation name $(name) for C4"))
-end
+const C4_perm_type = Tuple{Tuple{Int}, NTuple{4, Int}}
+const C4_ops = Dict{Symbol, C4_perm_type}(
+    :Id => ((1, ), (2, 3, 4, 5)),
+    :R1 => ((1, ), (3, 4, 5, 2)),
+    :R3 => ((1, ), (5, 2, 3, 4)),
+    :C2 => ((1, ), (4, 5, 2, 3)),
+)
+const C4_A_reps = Dict{Symbol, Int}(
+    :Id => 1, :R1 => 1, :R3 => 1, :C2 => 1,
+)
+const C4_B_reps = Dict{Symbol, Int}(
+    :Id => 1, :R1 => -1, :R3 => -1, :C2 => 1,
+)
