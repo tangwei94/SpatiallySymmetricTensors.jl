@@ -65,8 +65,8 @@ irrep_chars(::C4v, ::Val{:B1}) = C4v_B1_reps
 irrep_chars(::C4v, ::Val{:B2}) = C4v_B2_reps
 irrep_chars(::C4v, ::Val{:E}) = Dict(name => tr(mat) for (name, mat) in C4v_E_rep)
 
-irrep_rep(::C4v, ::Val{:A1}) = C4v_A1_reps
-irrep_rep(::C4v, ::Val{:A2}) = C4v_A2_reps
-irrep_rep(::C4v, ::Val{:B1}) = C4v_B1_reps
-irrep_rep(::C4v, ::Val{:B2}) = C4v_B2_reps
+irrep_rep(::C4v, ::Val{:A1}) = Dict(name => [χ;;] for (name, χ) in C4v_A1_reps)
+irrep_rep(::C4v, ::Val{:A2}) = Dict(name => [χ;;] for (name, χ) in C4v_A2_reps)
+irrep_rep(::C4v, ::Val{:B1}) = Dict(name => [χ;;] for (name, χ) in C4v_B1_reps)
+irrep_rep(::C4v, ::Val{:B2}) = Dict(name => [χ;;] for (name, χ) in C4v_B2_reps)
 irrep_rep(::C4v, ::Val{:E}) = C4v_E_rep

@@ -26,3 +26,7 @@ irrep_chars(::D2, ::Val{:A}) = D2_A_reps
 irrep_chars(::D2, ::Val{:B1}) = D2_B1_reps
 irrep_chars(::D2, ::Val{:B2}) = D2_B2_reps
 irrep_chars(::D2, ::Val{:B3}) = D2_B3_reps
+irrep_rep(::D2, ::Val{:A}) = Dict(name => [χ;;] for (name, χ) in D2_A_reps)
+irrep_rep(::D2, ::Val{:B1}) = Dict(name => [χ;;] for (name, χ) in D2_B1_reps)
+irrep_rep(::D2, ::Val{:B2}) = Dict(name => [χ;;] for (name, χ) in D2_B2_reps)
+irrep_rep(::D2, ::Val{:B3}) = Dict(name => [χ;;] for (name, χ) in D2_B3_reps)

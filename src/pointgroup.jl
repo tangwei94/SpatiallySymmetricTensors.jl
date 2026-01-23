@@ -34,6 +34,16 @@ function irrep_rep(::AbstractPointGroup, ::Val{reps_name}) where {reps_name}
     throw(ArgumentError("irrep_rep not implemented for this point group"))
 end
 
+"""
+    irrep_dim(spg::AbstractPointGroup, ::Val{reps_name})
+
+Return the dimension of the irrep.
+"""
+function irrep_dim(spg::AbstractPointGroup, ::Val{reps_name}) where {reps_name}
+    rep = irrep_rep(spg, reps_name)
+    return size(rep[:Id], 1)
+end
+
 irrep_rep(spg::AbstractPointGroup, reps_name::Symbol) = irrep_rep(spg, Val(reps_name))
 
 """
@@ -49,11 +59,14 @@ function projector_function(spg::AbstractPointGroup, reps_name::Symbol)
     for (op_name, perm) in ops
         χ = get(reps, op_name, nothing)
         χ === nothing && throw(ArgumentError("missing rep value for $(op_name) in $(reps_name)"))
-        push!(perms_with_char, (perm, ComplexF64(χ)))
+        if abs(χ) > 1e-12
+            push!(perms_with_char, (perm, ComplexF64(χ)))
+        end
     end
     isempty(perms_with_char) && throw(ArgumentError("no permutations found for $(spg)"))
 
-    norm_factor = 1.0 / length(perms_with_char)
+    dim = irrep_dim(spg, reps_name)
+    norm_factor = dim / length(ops)
 
     return function (T)
         acc = zero(T)

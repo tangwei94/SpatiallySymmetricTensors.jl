@@ -25,3 +25,5 @@ const C3v_A2_reps = Dict{Symbol, Int}(
 group_elements(::C3v) = C3v_ops
 irrep_chars(::C3v, ::Val{:A1}) = C3v_A1_reps
 irrep_chars(::C3v, ::Val{:A2}) = C3v_A2_reps
+irrep_rep(::C3v, ::Val{:A1}) = Dict(name => [χ;;] for (name, χ) in C3v_A1_reps)
+irrep_rep(::C3v, ::Val{:A2}) = Dict(name => [χ;;] for (name, χ) in C3v_A2_reps)
