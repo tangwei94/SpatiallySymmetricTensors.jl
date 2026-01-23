@@ -111,4 +111,6 @@ end
 
     @test size(Psel_S, 1) == num_paras
     @test size(Psel_S, 2) + size(Psel_L, 2) == num_paras
+    @test norm(Psel_S' * Psel_L) < 1e-12
+    @test rank(hcat(Psel_S, Psel_L)) == num_paras
 end
