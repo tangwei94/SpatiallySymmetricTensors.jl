@@ -61,39 +61,11 @@ end
 Find the subspace of `T` transforming under the representation `reps_name` of `spg`.
 """
 function find_subspace(spg::AbstractPointGroup, T::AbstractTensorMap, reps_name::Symbol; P_filter=nothing, verbose::Bool=false, tol::Real=1e-8)
-    reps = get_reps(spg, reps_name)
+    f_proj = projector_function(spg, reps_name)
     mt = mapping_table(T)
-
-    if isnothing(P_filter)
-        num_paras = num_free_parameters(T; _mapping_table=mt)
-        P_filter = Matrix{ComplexF64}(I, num_paras, num_paras)
-    end
-
-    P_sol = P_filter
-
+    P_sol = find_subspace_from_projector(T, f_proj; P_filter=P_filter, tol=tol, _mapping_table=mt)
     if verbose
-        println("init, size(P_sol) = ", size(P_sol))
-    end
-    for permutation in get_perm(spg, :σd)
-        f_op = linear_function_for_spatial_operation(permutation)
-        P_sol = find_subspace(T, P_sol, f_op; λ=reps[1], is_hermitian=true, tol=tol, _mapping_table=mt)
-        if verbose
-            println("operation σd, size(P_sol) = ", size(P_sol))
-        end
-    end
-    for permutation in get_perm(spg, :σv)
-        f_op = linear_function_for_spatial_operation(permutation)
-        P_sol = find_subspace(T, P_sol, f_op; λ=reps[2], is_hermitian=true, tol=tol, _mapping_table=mt)
-        if verbose
-            println("operation σv, size(P_sol) = ", size(P_sol))
-        end
-    end
-    for permutation in get_perm(spg, :R)
-        f_op = linear_function_for_spatial_operation(permutation)
-        P_sol = find_subspace(T, P_sol, f_op; λ=reps[3], is_hermitian=false, tol=tol, _mapping_table=mt)
-        if verbose
-            println("operation R, size(P_sol) = ", size(P_sol))
-        end
+        println("projector, size(P_sol) = ", size(P_sol))
     end
     return P_sol
 end
