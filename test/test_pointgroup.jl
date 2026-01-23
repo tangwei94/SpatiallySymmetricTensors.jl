@@ -34,6 +34,18 @@ function _check_find_subspace_and_solution(group, irrep_name, T)
             @test norm(permute(sol, perm) - χ * sol) < 1e-10
         end
     end
+    nsol = length(sols)
+    if nsol > 1
+        nchecks = 3
+        for _ in 1:nchecks
+            i = rand(1:nsol)
+            j = rand(1:nsol)
+            while j == i
+                j = rand(1:nsol)
+            end
+            @test norm(tr(sols[i]' * sols[j])) < 1e-10
+        end
+    end
 end
 
 @testset "C4 C4v, SU2Space 1d irreps" begin
