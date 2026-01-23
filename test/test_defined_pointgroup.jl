@@ -85,3 +85,32 @@ end
         end
     end
 end
+
+@testset "defined point groups: representations " begin
+    function is_identity_rep(M, Id_mat)
+        return norm(M - Id_mat) < 1e-12
+    end
+
+    # reflections / C2 elements square to identity
+    # rotations: order checks
+    for (group, irreps, rotation_order) in [
+        (C4v(), (:A1, :A2, :B1, :B2, :E), 4),
+        (C4(), (:A, :B), 4),
+        (C6v(), (:A1, :A2, :B1, :B2), 6),
+        (C3v(), (:A1, :A2), 3),
+    ]
+        rep_all = SpatiallySymmetricTensors.group_elements(group)
+        for irrep in irreps
+            rep = SpatiallySymmetricTensors.irrep_rep(group, irrep)
+            Id_mat = rep[:Id]
+            for name in keys(rep_all)
+                if occursin("σ", String(name)) || occursin("C2", String(name))
+                    @test is_identity_rep(rep[name]^2, Id_mat)
+                end
+                if occursin("R", String(name))
+                    @test is_identity_rep(rep[name]^rotation_order, Id_mat)
+                end
+            end
+        end
+    end
+end

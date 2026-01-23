@@ -7,5 +7,6 @@ using SpatiallySymmetricTensors
 include("test_spatial_operations.jl");
 include("test_defined_pointgroup.jl");
 include("test_pointgroup.jl");
+include("test_pointgroup_2dirreps.jl");
 include("test_square_lattice_SU2.jl");
 include("test_u1_charge_conjugation.jl");

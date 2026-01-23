@@ -18,3 +18,5 @@ const C4_B_reps = Dict{Symbol, Int}(
 group_elements(::C4) = C4_ops
 irrep_chars(::C4, ::Val{:A}) = C4_A_reps
 irrep_chars(::C4, ::Val{:B}) = C4_B_reps
+irrep_rep(::C4, ::Val{:A}) = Dict(name => [χ;;] for (name, χ) in C4_A_reps)
+irrep_rep(::C4, ::Val{:B}) = Dict(name => [χ;;] for (name, χ) in C4_B_reps)

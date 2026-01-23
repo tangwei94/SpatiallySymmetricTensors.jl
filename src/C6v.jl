@@ -47,3 +47,7 @@ irrep_chars(::C6v, ::Val{:A1}) = C6v_A1_reps
 irrep_chars(::C6v, ::Val{:A2}) = C6v_A2_reps
 irrep_chars(::C6v, ::Val{:B1}) = C6v_B1_reps
 irrep_chars(::C6v, ::Val{:B2}) = C6v_B2_reps
+irrep_rep(::C6v, ::Val{:A1}) = Dict(name => [χ;;] for (name, χ) in C6v_A1_reps)
+irrep_rep(::C6v, ::Val{:A2}) = Dict(name => [χ;;] for (name, χ) in C6v_A2_reps)
+irrep_rep(::C6v, ::Val{:B1}) = Dict(name => [χ;;] for (name, χ) in C6v_B1_reps)
+irrep_rep(::C6v, ::Val{:B2}) = Dict(name => [χ;;] for (name, χ) in C6v_B2_reps)

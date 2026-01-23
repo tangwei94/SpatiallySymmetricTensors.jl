@@ -63,7 +63,7 @@ end
 Project an initial subspace `P_init` onto the eigenspace of `f_op` with eigenvalue `λ`.
 Returns the basis matrix for the resulting subspace.
 """
-function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function; λ::Real=1.0, is_hermitian::Bool=false, tol::Real=1e-8, _mapping_table::MappingTable=mapping_table(T))
+function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Function; λ::Number=1.0, is_hermitian::Bool=false, tol::Real=1e-8, _mapping_table::MappingTable=mapping_table(T))
 
     init_subspace_size = size(P_init, 2)
     if init_subspace_size == 0
