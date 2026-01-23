@@ -86,7 +86,7 @@ function split_multiplets(::C4v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{
 
     f_σd1 = linear_function_for_spatial_operation(C4v_ops[:σd1])
     mat_σd1 = matrix_for_linear_function(T, f_σd1; _mapping_table=mt)
-    P_2 = mat_σd1 * P_1
+    P_2 = mat_σd1 * P_1 # fix the basis of P_2 to be consistent with P_1
 
     return P_1, P_2
 end
