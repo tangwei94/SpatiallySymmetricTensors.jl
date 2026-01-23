@@ -33,6 +33,7 @@ Return a dict of representation matrices for an irrep keyed by element symbols.
 function irrep_rep(::AbstractPointGroup, ::Val{reps_name}) where {reps_name}
     throw(ArgumentError("irrep_rep not implemented for this point group"))
 end
+irrep_rep(spg::AbstractPointGroup, reps_name::Symbol) = irrep_rep(spg, Val(reps_name))
 
 """
     irrep_dim(spg::AbstractPointGroup, ::Val{reps_name})
@@ -43,8 +44,7 @@ function irrep_dim(spg::AbstractPointGroup, ::Val{reps_name}) where {reps_name}
     rep = irrep_rep(spg, reps_name)
     return size(rep[:Id], 1)
 end
-
-irrep_rep(spg::AbstractPointGroup, reps_name::Symbol) = irrep_rep(spg, Val(reps_name))
+irrep_dim(spg::AbstractPointGroup, reps_name::Symbol) = irrep_dim(spg, Val(reps_name))
 
 """
     projector_function(spg::AbstractPointGroup, reps_name::Symbol)
