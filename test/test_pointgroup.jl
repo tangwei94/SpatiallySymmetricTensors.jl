@@ -110,17 +110,25 @@ end
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^4)
 
+    group = C4v()
     for irrep_name in (:A1, :B1)
-        P_sol = find_subspace(C4v(), T, irrep_name)
+        P_sol = find_subspace(group, T, irrep_name)
         if size(P_sol, 2) > 0
             @test norm(P_sol' * P_sol - Matrix{ComplexF64}(I, size(P_sol, 2), size(P_sol, 2))) < 1e-10
         end
 
-        sols = find_solution(C4v(), T, irrep_name)
-        fproj = SpatiallySymmetricTensors.projector_function(C4v(), irrep_name)
+        sols = find_solution(group, T, irrep_name)
+        fproj = SpatiallySymmetricTensors.projector_function(group, irrep_name)
+        ops = SpatiallySymmetricTensors.group_elements(group)
+        irrep_chars = SpatiallySymmetricTensors.irrep_chars(group, irrep_name)
         for sol in sols
             @test abs(norm(sol) - 1) < 1e-10
             @test norm(fproj(sol) - sol) < 1e-10
+            for (name, perm) in ops
+                χ = get(irrep_chars, name, nothing)
+                @test χ !== nothing
+                @test norm(permute(sol, perm) - χ * sol) < 1e-10
+            end
         end
     end
 end
