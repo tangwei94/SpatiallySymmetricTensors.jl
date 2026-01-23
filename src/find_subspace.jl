@@ -39,6 +39,10 @@ function find_subspace_from_projector(T::AbstractTensorMap, f_proj::Function; P_
     end
 
     M_op = matrix_for_linear_function(T, f_proj; _mapping_table=_mapping_table)
+    P_proj = P_filter * P_filter'
+    if norm(M_op * P_proj - P_proj * M_op) > tol
+        throw(ArgumentError("P_filter projector does not commute with projector matrix; subspace is a compressed map, not a projector image. Double-check your P_filter."))
+    end
     M_sub = P_filter' * M_op * P_filter
 
     F = qr(M_sub)
