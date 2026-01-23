@@ -81,36 +81,14 @@ Returns a pair `(P_sol_a, P_sol_b)` with `P_sol_b = R1 * P_sol_a`.
 function split_multiplets(::C4v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{<:Number}; _mapping_table::MappingTable=mapping_table(T))
 
     mt = _mapping_table
-
-    f_R = linear_function_for_spatial_operation(C4v_ops[:R1])
-    mat_R = matrix_for_linear_function(T, f_R; _mapping_table=mt)
-
-    rep_R = irrep_rep(C4v(), :E)[:R1]
-    Λ, Q = eigen( Hermitian(-im * rep_R) )
-
-    @show Λ
-    P_1 = find_subspace(T, P_sol, (x -> -im * f_R(x)); λ= Λ[1], _mapping_table=mt)
-    P_2 = find_subspace(T, P_sol, (x -> -im * f_R(x)); λ= Λ[2], _mapping_table=mt)
-
-    if size(P_1, 2) != size(P_2, 2)
-        throw(ArgumentError("split_multiplets expects equal multiplicities for ± eigen-subspaces, got $(size(P_1, 2)) and $(size(P_2, 2))"))
-    end
-
-    P_sol_a = Matrix(qr(P_1 * Q[1, 1] + P_2 * Q[2, 1]).Q)
-
+    
     f_σv1 = linear_function_for_spatial_operation(C4v_ops[:σv1])
-    mat_σv1 = matrix_for_linear_function(T, f_σv1; _mapping_table=mt)
+    rep_σv1 = irrep_rep(C4v(), :E)[:σv1] # rep_σv1 is diagonal
+    P_1 = find_subspace(T, P_sol, (x -> f_σv1(x)); λ= real(rep_σv1[1,1]), _mapping_table=mt)
 
-    rep_σv1 = irrep_rep(C4v(), :E)[:σv1]
-    Λ, Q = eigen( Hermitian(rep_σv1) )
-    @show Λ
-    P_1 = find_subspace(T, P_sol_a, (x -> f_σv1(x)); λ= Λ[1], _mapping_table=mt)
-    P_2 = find_subspace(T, P_sol_a, (x -> f_σv1(x)); λ= Λ[2], _mapping_table=mt)
+    f_σd1 = linear_function_for_spatial_operation(C4v_ops[:σd1])
+    mat_σd1 = matrix_for_linear_function(T, f_σd1; _mapping_table=mt)
+    P_2 = mat_σd1 * P_1
 
-    @show size(P_sol_a)
-    @show size(P_1), size(P_2)
-
-    P_sol_b = mat_R * P_sol_a
-
-    return P_sol_a, P_sol_b
+    return P_1, P_2
 end
