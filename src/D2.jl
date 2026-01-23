@@ -13,3 +13,7 @@ const D2_A_reps = Dict{Symbol, Int}(
 const D2_B1_reps = Dict{Symbol, Int}(
     :Id => 1, :σv1 => -1, :σv2 => -1,
 )
+
+group_elements(::D2) = D2_ops
+irrep_chars(::D2, ::Val{:A}) = D2_A_reps
+irrep_chars(::D2, ::Val{:B1}) = D2_B1_reps

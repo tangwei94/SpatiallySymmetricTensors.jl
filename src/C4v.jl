@@ -30,27 +30,20 @@ const C4v_B1_reps = Dict{Symbol, Int}(
     :Id => 1,
     :σd1 => -1, :σd2 => -1,
     :σv1 => 1, :σv2 => 1,
-    :R1 => 1, :R3 => 1,
+    :R1 => -1, :R3 => -1,
     :C2 => 1,
 )
 const C4v_B2_reps = Dict{Symbol, Int}(
     :Id => 1,
     :σd1 => 1, :σd2 => 1,
     :σv1 => -1, :σv2 => -1,
-    :R1 => 1, :R3 => 1,
+    :R1 => -1, :R3 => -1,
     :C2 => 1,
 )
 
-#
-#function get_reps(::C4v, name::Symbol)
-#    (name == :A1) && return C4v_A1_reps
-#    (name == :A2) && return C4v_A2_reps
-#    (name == :B1) && return C4v_B1_reps
-#    (name == :B2) && return C4v_B2_reps
-#    throw(ArgumentError("unknown representation name $(name) for C4v"))
-#end
-#function get_perm(::C4v, name::Symbol)
-#    haskey(C4v_ops, name) && return C4v_ops[name]
-#    throw(ArgumentError("unknown operation name $(name) for C4v"))
-#end
-#
+group_elements(::C4v) = C4v_ops
+irrep_chars(::C4v, ::Val{:A1}) = C4v_A1_reps
+irrep_chars(::C4v, ::Val{:A2}) = C4v_A2_reps
+irrep_chars(::C4v, ::Val{:B1}) = C4v_B1_reps
+irrep_chars(::C4v, ::Val{:B2}) = C4v_B2_reps
+

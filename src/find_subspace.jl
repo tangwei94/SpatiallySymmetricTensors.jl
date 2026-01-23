@@ -32,12 +32,6 @@ function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Fun
     end
 
     if norm(P_init' * P_init - Matrix{eltype(P_init)}(I, init_subspace_size, init_subspace_size)) > tol
-        #for ix in 1:init_subspace_size
-        #    for iy in 1:init_subspace_size
-        #        print(" ", (P_init' * P_init)[ix, iy], " ")
-        #    end
-        #    println(" ")
-        #end
         error("input subspace is not orthonormal")
     end
 

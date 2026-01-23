@@ -38,3 +38,9 @@ const C6v_B2_reps = Dict{Symbol, Int}(
     :σv1 => -1, :σv2 => -1, :σv3 => -1,
     :R1 => -1, :R2 => -1,
 )
+
+group_elements(::C6v) = C6v_ops
+irrep_chars(::C6v, ::Val{:A1}) = C6v_A1_reps
+irrep_chars(::C6v, ::Val{:A2}) = C6v_A2_reps
+irrep_chars(::C6v, ::Val{:B1}) = C6v_B1_reps
+irrep_chars(::C6v, ::Val{:B2}) = C6v_B2_reps

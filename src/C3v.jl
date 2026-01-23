@@ -21,3 +21,7 @@ const C3v_A2_reps = Dict{Symbol, Int}(
     :R1 => 1, :R2 => 1,
     :σv1 => -1, :σv2 => -1, :σv3 => -1,
 )
+
+group_elements(::C3v) = C3v_ops
+irrep_chars(::C3v, ::Val{:A1}) = C3v_A1_reps
+irrep_chars(::C3v, ::Val{:A2}) = C3v_A2_reps
