@@ -26,6 +26,17 @@ end
 irrep_chars(spg::AbstractPointGroup, reps_name::Symbol) = irrep_chars(spg, Val(reps_name))
 
 """
+    irrep_rep(spg::AbstractPointGroup, ::Val{reps_name})
+
+Return a dict of representation matrices for an irrep keyed by element symbols.
+"""
+function irrep_rep(::AbstractPointGroup, ::Val{reps_name}) where {reps_name}
+    throw(ArgumentError("irrep_rep not implemented for this point group"))
+end
+
+irrep_rep(spg::AbstractPointGroup, reps_name::Symbol) = irrep_rep(spg, Val(reps_name))
+
+"""
     projector_function(spg::AbstractPointGroup, reps_name::Symbol)
 
 Return a function that applies the irrep projector: P = d_reps / |G| ∑_{g ∈ G} conj(χ)(g) ρ(g)
