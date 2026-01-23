@@ -1,4 +1,4 @@
-"""D2 point group (two reflections)."""
+"""D2 point group (two reflections and a 180 degree rotation)."""
 struct D2 <: AbstractPointGroup end
 
 const D2_perm_type = Tuple{Tuple{Int}, NTuple{4, Int}}

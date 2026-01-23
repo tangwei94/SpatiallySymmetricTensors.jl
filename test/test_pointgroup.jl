@@ -104,3 +104,23 @@ end
         _check_projector(group, irrep_name, rand(ComplexF64, P, V^4))
     end
 end
+
+@testset "find_subspace and find_solution C4v, SU2Space" begin
+    V = SU2Space(1//2=>1, 0=>1)
+    P = SU2Space(1//2=>1)
+    T = zeros(ComplexF64, P, V^4)
+
+    for irrep_name in (:A1, :B1)
+        P_sol = find_subspace(C4v(), T, irrep_name)
+        if size(P_sol, 2) > 0
+            @test norm(P_sol' * P_sol - Matrix{ComplexF64}(I, size(P_sol, 2), size(P_sol, 2))) < 1e-10
+        end
+
+        sols = find_solution(C4v(), T, irrep_name)
+        fproj = SpatiallySymmetricTensors.projector_function(C4v(), irrep_name)
+        for sol in sols
+            @test abs(norm(sol) - 1) < 1e-10
+            @test norm(fproj(sol) - sol) < 1e-10
+        end
+    end
+end
