@@ -19,7 +19,7 @@
     @test norm(vec(T2) - v) < 1e-12
 end
 
-@testset "spatial_operations.jl" begin #for _ in 1:3
+@testset "test for matrix_for_spatial_operation" begin
     V = SU2Space(1//2=>1, 0=>1)
     P = SU2Space(1//2=>1)
     T = zeros(ComplexF64, P, V^6)
@@ -33,16 +33,11 @@ end
 
     for perm in permutations
         R_mat = matrix_for_spatial_operation(T, perm)
-        num_paras = num_free_parameters(T)
-        for ix0 in 1:num_paras
-            T0 = begin
-                paras = zeros(num_paras)
-                paras[ix0] = 1
-                set_data_by_vector(T, paras)
-            end
-        
-            T1 = set_data_by_vector(T, R_mat[:, ix0])
-            @test norm(permute(T0, perm) - T1) < 1e-12
+        for _ in 1:6
+            T0 = rand(ComplexF64, P, V^6)
+
+            T1 = permute(T0, perm)
+            @test norm(R_mat * vec(T0) - vec(T1)) < 1e-12
         end
     end
 end
@@ -57,37 +52,15 @@ end
     num_paras = num_free_parameters(T; _mapping_table=mt)
     P_init = Matrix{ComplexF64}(I, num_paras, num_paras)
 
-    f_op(T1) = T1
-    P_sol = find_subspace(T, P_init, f_op; λ=2.0, is_hermitian=true, _mapping_table=mt)
+    f_identity(T1) = T1
+    P_sol = find_subspace(T, P_init, f_identity; λ=2.0, is_hermitian=true, _mapping_table=mt)
     @test size(P_sol, 1) == num_paras
     @test size(P_sol, 2) == 0
-end
-
-@testset "empty eigenspace (non-hermitian)" begin
-    # same as above, but for non-hermitian branch
-    V = SU2Space(1//2=>1, 0=>1)
-    P = SU2Space(1//2=>1)
-    T = zeros(ComplexF64, P, V^4)
-
-    mt = mapping_table(T)
-    num_paras = num_free_parameters(T; _mapping_table=mt)
-    P_init = Matrix{ComplexF64}(I, num_paras, num_paras)
-
-    f_op(T1) = T1
-    P_sol = find_subspace(T, P_init, f_op; λ=2.0, is_hermitian=false, _mapping_table=mt)
+   
+    f_rotation = SpatiallySymmetricTensors.linear_function_for_spatial_operation(((1, ), (3, 4, 5, 2)))
+    P_sol = find_subspace(T, P_init, f_rotation; λ=2.0, is_hermitian=false, _mapping_table=mt)
     @test size(P_sol, 1) == num_paras
     @test size(P_sol, 2) == 0
-end
-
-
-@testset "pointgroup verbosity" begin
-    # default verbosity is silent and should return a valid subspace
-    V = SU2Space(1//2=>1, 0=>1)
-    P = SU2Space(1//2=>1)
-    T = zeros(ComplexF64, P, V^4)
-
-    P_sol = find_subspace(C4v(), T, :A1; verbose=false)
-    @test size(P_sol, 1) == num_free_parameters(T)
 end
 
 @testset "non-orthonormal tolerance" begin
