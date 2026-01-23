@@ -85,3 +85,21 @@ end
         end
     end
 end
+
+@testset "defined point groups: representations " begin
+
+    group = C4v()
+
+    for irrep in (:A1, :A2, :B1, :B2, :E)
+        rep = SpatiallySymmetricTensors.irrep_rep(group, irrep)
+        Id_mat = rep[:Id]
+        _is_identity(M) = norm(M - Id_mat) < 1e-12
+        @test _is_identity(rep[:R1]^4)
+        @test _is_identity(rep[:R3]^4)
+        @test _is_identity(rep[:C2]^2)
+        @test _is_identity(rep[:σv1]^2)
+        @test _is_identity(rep[:σv2]^2)
+        @test _is_identity(rep[:σd1]^2)
+        @test _is_identity(rep[:σd2]^2)
+    end
+end
