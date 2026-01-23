@@ -76,15 +76,20 @@ function split_multiplets(::C4v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{
     mt = _mapping_table
 
     f_R = linear_function_for_spatial_operation(C4v_ops[:R1])
+    mat_R = matrix_for_linear_function(T, f_R; _mapping_table=mt)
     rep_R = irrep_rep(C4v(), :E)[:R1]
     Λ, Q = eigen( Hermitian(-im * rep_R) )
 
     P_1 = find_subspace(T, P_sol, (x -> -im * f_R(x)); λ= Λ[1], _mapping_table=mt)
     P_2 = find_subspace(T, P_sol, (x -> -im * f_R(x)); λ= Λ[2], _mapping_table=mt)
 
-    P_sol_a = P_1 * Q[1, 1] + P_2 * Q[2, 1]
-    P_sol_b = P_1 * Q[1, 2] + P_2 * Q[2, 2]
-   
+    if size(P_1, 2) != size(P_2, 2)
+        throw(ArgumentError("split_multiplets expects equal multiplicities for ± eigen-subspaces, got $(size(P_1, 2)) and $(size(P_2, 2))"))
+    end
+
+    P_sol_a = Matrix(qr(P_1 * Q[1, 1] + P_2 * Q[2, 1]).Q)
+    P_sol_b = mat_R * P_sol_a
+
     return P_sol_a, P_sol_b
 
 end
