@@ -70,3 +70,21 @@ irrep_rep(::C4v, ::Val{:A2}) = Dict(name => [χ;;] for (name, χ) in C4v_A2_reps
 irrep_rep(::C4v, ::Val{:B1}) = Dict(name => [χ;;] for (name, χ) in C4v_B1_reps)
 irrep_rep(::C4v, ::Val{:B2}) = Dict(name => [χ;;] for (name, χ) in C4v_B2_reps)
 irrep_rep(::C4v, ::Val{:E}) = C4v_E_rep
+
+function split_multiplets(::C4v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{<:Number}; _mapping_table::MappingTable=mapping_table(T))
+
+    mt = _mapping_table
+
+    f_R = linear_function_for_spatial_operation(C4v_ops[:R1])
+    rep_R = irrep_rep(C4v(), :E)[:R1]
+    Λ, Q = eigen( Hermitian(-im * rep_R) )
+
+    P_1 = find_subspace(T, P_sol, (x -> -im * f_R(x)); λ= Λ[1], _mapping_table=mt)
+    P_2 = find_subspace(T, P_sol, (x -> -im * f_R(x)); λ= Λ[2], _mapping_table=mt)
+
+    P_sol_a = P_1 * Q[1, 1] + P_2 * Q[2, 1]
+    P_sol_b = P_1 * Q[1, 2] + P_2 * Q[2, 2]
+   
+    return P_sol_a, P_sol_b
+
+end
