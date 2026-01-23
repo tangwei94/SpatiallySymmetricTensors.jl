@@ -1,7 +1,7 @@
 name = "SpatiallySymmetricTensors"
 uuid = "267f34df-16a8-4a72-a26d-fb880b511394"
 authors = ["Wei Tang <tangwei@smail.nju.edu.cn> and contributors"]
-version = "0.1.4"
+version = "0.1.5"
 
 [deps]
 KrylovKit = "0b1a1467-8014-51b9-945f-bf0ae24f4b77"
