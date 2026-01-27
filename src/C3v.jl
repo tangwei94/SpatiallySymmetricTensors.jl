@@ -28,8 +28,8 @@ const C3v_E_reps = Dict{Symbol, Int}(
 )
 const C3v_E_rep = Dict{Symbol, Matrix{ComplexF64}}(
     :Id => ComplexF64[1 0; 0 1],
-    :R1 => ComplexF64[-1/2 -sqrt(3)/2; sqrt(3)/2 -1/2],
-    :R2 => ComplexF64[-1/2 sqrt(3)/2; -sqrt(3)/2 -1/2],
+    :R1 => ComplexF64[-1/2 sqrt(3)/2; -sqrt(3)/2 -1/2],
+    :R2 => ComplexF64[-1/2 -sqrt(3)/2; sqrt(3)/2 -1/2],
     :σv1 => ComplexF64[1 0; 0 -1],
     :σv2 => ComplexF64[-1/2 -sqrt(3)/2; -sqrt(3)/2 1/2],
     :σv3 => ComplexF64[-1/2 sqrt(3)/2; sqrt(3)/2 1/2],
