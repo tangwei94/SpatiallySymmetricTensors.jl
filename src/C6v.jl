@@ -83,3 +83,23 @@ irrep_rep(::C6v, ::Val{:B1}) = Dict(name => [χ;;] for (name, χ) in C6v_B1_reps
 irrep_rep(::C6v, ::Val{:B2}) = Dict(name => [χ;;] for (name, χ) in C6v_B2_reps)
 irrep_rep(::C6v, ::Val{:E1}) = C6v_E1_rep
 irrep_rep(::C6v, ::Val{:E2}) = C6v_E2_rep
+
+"""
+    split_multiplets(::C6v, T::AbstractTensorMap, ::Val{:E1}, P_sol::Matrix{<:Number}; _mapping_table=mapping_table(T))
+    split_multiplets(::C6v, T::AbstractTensorMap, ::Val{:E2}, P_sol::Matrix{<:Number}; _mapping_table=mapping_table(T))
+
+Split the E1/E2-irrep subspace `P_sol` into two multiplet components.
+"""
+function split_multiplets(::C6v, T::AbstractTensorMap, rep::Union{Val{:E1}, Val{:E2}}, P_sol::Matrix{<:Number}; _mapping_table::MappingTable=mapping_table(T))
+    mt = _mapping_table
+
+    f_σv1 = linear_function_for_spatial_operation(C6v_ops[:σv1])
+    rep_σv1 = irrep_rep(C6v(), rep)[:σv1] # rep_σv1 is diagonal
+    P_1 = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[1,1]), _mapping_table=mt)
+
+    f_σd1 = linear_function_for_spatial_operation(C6v_ops[:σd1])
+    mat_σd1 = matrix_for_linear_function(T, f_σd1; _mapping_table=mt)
+    P_2 = mat_σd1 * P_1 # fix the basis of P_2 to be consistent with P_1
+
+    return P_1, P_2
+end
