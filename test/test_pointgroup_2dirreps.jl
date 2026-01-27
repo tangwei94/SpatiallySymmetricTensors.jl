@@ -44,18 +44,15 @@ function _check_find_solution_2dirreps(group, irrep_name, num_virtual_space::Int
         for (gname, gperm) in ops
             rep_g = rep[gname]
             # [g(T1), g(T2)] =[T1 T2] * rep_g
-            if norm(T1 * rep_g[1, 1] + T2 * rep_g[2, 1] - permute(T1, gperm)) > 1e-10
-                #@show group, irrep_name, gname, norm(T1 * rep_g[1, 1] + T2 * rep_g[2, 1] - permute(T1, gperm))
-            end
-            #@test norm(T1 * rep_g[1, 1] + T2 * rep_g[2, 1] - permute(T1, gperm)) < 1e-10
-            #@test norm(T1 * rep_g[1, 2] + T2 * rep_g[2, 2] - permute(T2, gperm)) < 1e-10
+            @test norm(T1 * rep_g[1, 1] + T2 * rep_g[2, 1] - permute(T1, gperm)) < 1e-10
+            @test norm(T1 * rep_g[1, 2] + T2 * rep_g[2, 2] - permute(T2, gperm)) < 1e-10
         end
     end
 end
 
 @testset "find_solution point group  E irreps" begin
     _check_find_solution_2dirreps(C4v(), :E, 4)
-    #_check_find_solution_2dirreps(C3v(), :E, 3)
-    #_check_find_solution_2dirreps(C6v(), :E1, 6)
+    _check_find_solution_2dirreps(C3v(), :E, 3)
+    _check_find_solution_2dirreps(C6v(), :E1, 6)
     _check_find_solution_2dirreps(C6v(), :E2, 6)
 end

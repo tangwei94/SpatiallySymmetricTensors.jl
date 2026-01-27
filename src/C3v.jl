@@ -53,8 +53,7 @@ function split_multiplets(::C3v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{
     mt = _mapping_table
 
     f_σv1 = linear_function_for_spatial_operation(C3v_ops[:σv1])
-    rep_σv1 = irrep_rep(C3v(), :E)[:σv1] # rep_σv1 is diagonal
-    @show rep_σv1
+    rep_σv1 = irrep_rep(C3v(), :E)[:σv1] # rep_σv1 is diagonal, σv1 is hermitian
     P_1 = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[1,1]), is_hermitian=true, _mapping_table=mt)
     P_2_rotated = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[2,2]), is_hermitian=true, _mapping_table=mt)
 
