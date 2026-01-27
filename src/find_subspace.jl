@@ -20,7 +20,7 @@ end
 """
     find_subspace_from_projector(T::AbstractTensorMap, f_proj::Function; P_filter=nothing, tol=1e-8, _mapping_table=mapping_table(T))
 
-Construct a symmetry subspace by QR-decomposing the projector matrix.
+Construct a symmetry subspace by SVD-decomposing the projector matrix.
 """
 function find_subspace_from_projector(T::AbstractTensorMap, f_proj::Function; P_filter=nothing, tol::Real=1e-8, _mapping_table::MappingTable=mapping_table(T))
     num_paras = num_free_parameters(T; _mapping_table=_mapping_table)

@@ -7,6 +7,9 @@ abstract type AbstractPointGroup end
     group_elements(spg::AbstractPointGroup)
 
 Return a dict of group elements (as permutations) keyed by symbols.
+
+These tuples are used in TensorKit.permute. This corresponds to the following convention: A permutation tuple `(1, (a, b, c, ...))` means `1 -> 1, a -> 2`, `b -> 3`, `c -> 4`, ...
+This is the inverse of the more common `1 -> 1, 2 -> a, 3 -> b, 4 -> c, ...` convention.
 """
 function group_elements(::AbstractPointGroup)
     # if the input does not match any of the defined point groups, throw an error
