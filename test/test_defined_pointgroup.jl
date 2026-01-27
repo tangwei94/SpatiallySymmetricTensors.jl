@@ -118,8 +118,6 @@ end
 @testset "defined point groups: check S R S = inv(R)" begin
     for (group, irrep_name) in [(C3v(), :E), (C4v(), :E), (C6v(), :E1), (C6v(), :E2)]
         rep = SpatiallySymmetricTensors.irrep_rep(group, irrep_name)
-        S = rep[:σv1]
-        R = rep[:R1]
         for Sname in keys(rep), Rname in keys(rep)
             if occursin("σ", String(Sname)) && occursin("R", String(Rname))
                 repS = rep[Sname]
