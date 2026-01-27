@@ -47,6 +47,7 @@ function find_subspace_from_projector(T::AbstractTensorMap, f_proj::Function; P_
 
     F = qr(M_sub)
     R = F.R
+    @show norm.(diag(R))
     keep = findall(abs.(diag(R)) .> tol)
     if isempty(keep)
         @warn "output subspace is empty, returning empty subspace"
@@ -77,6 +78,10 @@ function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Fun
 
     M_op = matrix_for_linear_function(T, f_op; _mapping_table=_mapping_table)
     M_op_sub = P_init' * M_op * P_init
+
+    @show M_op * M_op' - Matrix{eltype(M_op)}(I, size(M_op, 2), size(M_op, 2)) |> norm
+    @show M_op_sub * M_op_sub' - Matrix{eltype(M_op_sub)}(I, size(M_op_sub, 2), size(M_op_sub, 2)) |> norm
+
     if ! is_hermitian
         Λop, Uop = eigen(M_op_sub)
         Pop = Uop[:, norm.(Λop .- λ) .< tol]
@@ -86,6 +91,7 @@ function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Fun
         Pop = Matrix(qr(Pop).Q) # orthonormalize the basis
     else
         Λop, Uop = eigen(Hermitian(M_op_sub))
+        @show Λop
         Pop = Uop[:, norm.(Λop .- λ) .< tol]
         if size(Pop, 2) == 0
             return P_init[:, 1:0]

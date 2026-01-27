@@ -130,6 +130,16 @@ end
     end
 end
 
+@testset "defined point groups: rep unitarity (2D irreps)" begin
+    for (group, irrep) in [(C3v(), :E), (C4v(), :E), (C6v(), :E1), (C6v(), :E2)]
+        rep = SpatiallySymmetricTensors.irrep_rep(group, irrep)
+        Id_mat = rep[:Id]
+        for name in keys(rep)
+            @test norm(rep[name]' * rep[name] - Id_mat) < 1e-12
+        end
+    end
+end
+
 @testset "defined point groups: rep matches permutation multiplication" begin
 
     function composed_perm_label(ops, p)
@@ -155,9 +165,6 @@ end
         for (gname, gperm) in ops, (hname, hperm) in ops
             ghperm = compose_perm(gperm, hperm)
             ghname = composed_perm_label(ops, ghperm)
-            if norm(rep[gname] * rep[hname] - rep[ghname]) > 1e-12
-                @show group, irrep, gname, hname, ghname
-            end
             @test norm(rep[gname] * rep[hname] - rep[ghname]) < 1e-12
         end
     end

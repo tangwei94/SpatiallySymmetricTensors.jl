@@ -95,8 +95,9 @@ function split_multiplets(::C6v, T::AbstractTensorMap, rep::Union{Val{:E1}, Val{
 
     f_σv1 = linear_function_for_spatial_operation(C6v_ops[:σv1])
     rep_σv1 = irrep_rep(C6v(), rep)[:σv1] # rep_σv1 is diagonal
-    P_1 = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[1,1]), _mapping_table=mt)
-    P_2_rotated = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[2,2]), _mapping_table=mt)
+    P_1 = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[1,1]), is_hermitian=true, _mapping_table=mt)
+    P_2_rotated = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[2,2]), is_hermitian=true, _mapping_table=mt)
+    @show size(P_1), size(P_2_rotated), size(P_sol)
 
     # `P_2_rotated` is not uniquely determined: it is defined only up to a gauge transformation `Q` within the irrep subspace, i.e. `P_2_rotated = P_2 * Q`.
     # We fix this gauge so that, in the chosen basis, the representation matches the E-irrep matrices in `C6v_E1_rep`/`C6v_E2_rep`.
@@ -105,6 +106,7 @@ function split_multiplets(::C6v, T::AbstractTensorMap, rep::Union{Val{:E1}, Val{
     mat_σd1 = matrix_for_linear_function(T, f_σd1; _mapping_table=mt)
     Qdag = inv(rep_σd1[2, 1]) * P_2_rotated' * mat_σd1 * P_1
     P_2 = P_2_rotated * Qdag
+    @show Qdag * Qdag' 
 
     return P_1, P_2
 end
