@@ -5,6 +5,7 @@ function _check_projector_function_2dirreps(group, irrep_name, num_virtual_space
 
     fproj = SpatiallySymmetricTensors.projector_function(group, irrep_name)
     M_proj = SpatiallySymmetricTensors.matrix_for_linear_function(T, fproj)
+    P_proj = SpatiallySymmetricTensors.find_subspace_from_projector(T, fproj)
     Tp = fproj(T)
     @test norm(fproj(Tp) - Tp) < 1e-10
     @test norm(M_proj * M_proj - M_proj) < 1e-10
@@ -16,6 +17,9 @@ function _check_projector_function_2dirreps(group, irrep_name, num_virtual_space
 
         @test norm(fproj(f_perm(T)) - f_perm(fproj(T))) < 1e-10
         @test norm(M_proj * M_perm - M_perm * M_proj) < 1e-10
+        M_perm_sub = P_proj' * M_perm * P_proj
+        dim_sub = size(M_perm_sub, 2)
+        @test norm(M_perm_sub * M_perm_sub' - Matrix{ComplexF64}(I, dim_sub, dim_sub)) < 1e-10
     end
 
 end
