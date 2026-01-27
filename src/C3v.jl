@@ -11,20 +11,15 @@ const C3v_ops = Dict{Symbol, C3v_perm_type}(
     :σv3 => ((1, ), (4, 3, 2)),
 )
 
-const C3v_A1_reps = Dict{Symbol, Int}(
+const C3v_A1_chars = Dict{Symbol, Int}(
     :Id => 1,
     :R1 => 1, :R2 => 1,
     :σv1 => 1, :σv2 => 1, :σv3 => 1,
 )
-const C3v_A2_reps = Dict{Symbol, Int}(
+const C3v_A2_chars = Dict{Symbol, Int}(
     :Id => 1,
     :R1 => 1, :R2 => 1,
     :σv1 => -1, :σv2 => -1, :σv3 => -1,
-)
-const C3v_E_reps = Dict{Symbol, Int}(
-    :Id => 2,
-    :R1 => -1, :R2 => -1,
-    :σv1 => 0, :σv2 => 0, :σv3 => 0,
 )
 const C3v_E_rep = Dict{Symbol, Matrix{ComplexF64}}(
     :Id => ComplexF64[1 0; 0 1],
@@ -36,11 +31,11 @@ const C3v_E_rep = Dict{Symbol, Matrix{ComplexF64}}(
 )
 
 group_elements(::C3v) = C3v_ops
-irrep_chars(::C3v, ::Val{:A1}) = C3v_A1_reps
-irrep_chars(::C3v, ::Val{:A2}) = C3v_A2_reps
+irrep_chars(::C3v, ::Val{:A1}) = C3v_A1_chars
+irrep_chars(::C3v, ::Val{:A2}) = C3v_A2_chars
 irrep_chars(::C3v, ::Val{:E}) = Dict(name => tr(mat) for (name, mat) in C3v_E_rep)
-irrep_rep(::C3v, ::Val{:A1}) = Dict(name => [χ;;] for (name, χ) in C3v_A1_reps)
-irrep_rep(::C3v, ::Val{:A2}) = Dict(name => [χ;;] for (name, χ) in C3v_A2_reps)
+irrep_rep(::C3v, ::Val{:A1}) = Dict(name => [χ;;] for (name, χ) in C3v_A1_chars)
+irrep_rep(::C3v, ::Val{:A2}) = Dict(name => [χ;;] for (name, χ) in C3v_A2_chars)
 irrep_rep(::C3v, ::Val{:E}) = C3v_E_rep
 
 """
