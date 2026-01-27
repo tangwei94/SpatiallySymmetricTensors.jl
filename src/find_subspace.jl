@@ -45,17 +45,15 @@ function find_subspace_from_projector(T::AbstractTensorMap, f_proj::Function; P_
     end
     M_sub = P_filter' * M_op * P_filter
 
-    F = qr(M_sub)
-    R = F.R
-    @show norm.(diag(R))
-    keep = findall(abs.(diag(R)) .> tol)
+    U, S, _ = svd(M_sub)
+    Smax = isempty(S) ? zero(eltype(S)) : maximum(S)
+    keep = findall(S .> tol * Smax)
     if isempty(keep)
         @warn "output subspace is empty, returning empty subspace"
         return P_filter[:, 1:0]
     end
 
-    Q = Matrix(F.Q)
-    return P_filter * Q[:, keep]
+    return P_filter * U[:, keep]
 end
 
 """
