@@ -83,10 +83,16 @@ function split_multiplets(::C4v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{
     f_σv1 = linear_function_for_spatial_operation(C4v_ops[:σv1])
     rep_σv1 = irrep_rep(C4v(), :E)[:σv1] # rep_σv1 is diagonal
     P_1 = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[1,1]), _mapping_table=mt)
+    P_2_rotated = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[2,2]), _mapping_table=mt)
 
+    # `P_2_rotated` is not uniquely determined: it is defined only up to a gauge transformation `Q` within the irrep subspace, i.e. `P_2_rotated = P_2 * Q`.
+    # We fix this gauge so that, in the chosen basis, the representation matches the E-irrep matrices in `C4v_E_rep`.
+    # In practice this may be unnecessary, since the matrices in `C4v_E_rep` are not unique themselves and can be rotated by unitary transformations.
     f_σd1 = linear_function_for_spatial_operation(C4v_ops[:σd1])
+    rep_σd1 = irrep_rep(C4v(), :E)[:σd1] # rep_σd1 not diagonal
     mat_σd1 = matrix_for_linear_function(T, f_σd1; _mapping_table=mt)
-    P_2 = mat_σd1 * P_1 # fix the basis of P_2 to be consistent with P_1
+    Qdag = inv(rep_σd1[2, 1]) * P_2_rotated' * mat_σd1 * P_1 
+    P_2 = P_2_rotated * Qdag
 
     return P_1, P_2
 end
