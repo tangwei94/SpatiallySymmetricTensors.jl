@@ -45,7 +45,7 @@ end
 ```
 where `x` is the free parameter.
 
-Note: 2D "E" irreps are also supported (including C3v:E, C4v:E, C6v:E1/E2). For these, `find_solution` returns an even-length vector: the first half are the first components and the second half are their partners.
+**Note**: Since v0.2.0, 2D "E" irreps are also supported (including C3v:E, C4v:E, C6v:E1/E2). For these, `find_solution` returns an even-length vector: the first half are the first components and the second half are their partners.
 Using the example above, 
 ```julia
 sols_E = find_solution(C4v(), T0, :E)
