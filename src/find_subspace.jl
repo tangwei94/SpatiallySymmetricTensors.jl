@@ -47,8 +47,7 @@ function find_subspace_from_projector(T::AbstractTensorMap, f_proj::Function; P_
 
     # SVD decomposition to find the subspace. QR decomposition can be unstable in certain cases.  
     U, S, _ = svd(M_sub)
-    Smax = isempty(S) ? zero(eltype(S)) : maximum(S)
-    keep = findall(S .> tol * Smax)
+    keep = findall(S .> tol)
     if isempty(keep)
         @warn "output subspace is empty, returning empty subspace"
         return P_filter[:, 1:0]
