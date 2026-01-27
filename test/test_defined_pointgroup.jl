@@ -127,3 +127,37 @@ end
         end
     end
 end
+
+@testset "defined point groups: rep matches permutation multiplication" begin
+
+    function composed_perm_label(ops, p)
+        for (name, perm) in ops
+            if p[1] == perm[1] && p[2] == perm[2]
+                return name
+            end
+        end
+        error("no permutation label matches composed permutation")
+    end
+
+    function compose_perm(p1, p2)
+        a = p1[2]
+        b = p2[2]
+        #composed = ntuple(i -> a[b[i] - 1], length(a))
+        composed = ntuple(i -> b[a[i] - 1], length(a))
+        return (p1[1], composed)
+    end
+
+    #for (group, irrep) in [(C3v(), :E), (C4v(), :E), (C6v(), :E1), (C6v(), :E2)]
+    for (group, irrep) in [(C4v(), :E)]
+        ops = SpatiallySymmetricTensors.group_elements(group)
+        rep = SpatiallySymmetricTensors.irrep_rep(group, irrep)
+        for (gname, gperm) in ops, (hname, hperm) in ops
+            ghperm = compose_perm(gperm, hperm)
+            ghname = composed_perm_label(ops, ghperm)
+            if norm(rep[gname] * rep[hname] - rep[ghname]) > 1e-12
+                @show group, irrep, gname, hname, ghname
+            end
+            @test norm(rep[gname] * rep[hname] - rep[ghname]) < 1e-12
+        end
+    end
+end
