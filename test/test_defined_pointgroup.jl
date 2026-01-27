@@ -26,10 +26,12 @@ end
 
 @testset "defined point groups: perm algebra" begin
     # check involution for reflections and group order/inverse for rotations
+    # Perm convention: p = (1, (a,b,c,...)) means a->1, b->2, c->3, ...
     function compose_perm(p1, p2)
         a = p1[2]
         b = p2[2]
-        composed = ntuple(i -> a[b[i] - 1], length(a))
+        n = length(a)
+        composed = ntuple(i -> b[a[i] - 1], n) # subtle! see perm convention above. a[i] -> i, b[i] -> a[i]
         return (p1[1], composed)
     end
 
@@ -111,6 +113,59 @@ end
                     @test is_identity_rep(rep[name]^rotation_order, Id_mat)
                 end
             end
+        end
+    end
+end
+
+@testset "defined point groups: check S R S = inv(R)" begin
+    for (group, irrep_name) in [(C3v(), :E), (C4v(), :E), (C6v(), :E1), (C6v(), :E2)]
+        rep = SpatiallySymmetricTensors.irrep_rep(group, irrep_name)
+        for Sname in keys(rep), Rname in keys(rep)
+            if occursin("σ", String(Sname)) && occursin("R", String(Rname))
+                repS = rep[Sname]
+                repR = rep[Rname]
+                @test norm(repS * repR * repS - inv(repR)) < 1e-12
+            end
+        end
+    end
+end
+
+@testset "defined point groups: rep unitarity (2D irreps)" begin
+    for (group, irrep) in [(C3v(), :E), (C4v(), :E), (C6v(), :E1), (C6v(), :E2)]
+        rep = SpatiallySymmetricTensors.irrep_rep(group, irrep)
+        Id_mat = rep[:Id]
+        for name in keys(rep)
+            @test norm(rep[name]' * rep[name] - Id_mat) < 1e-12
+        end
+    end
+end
+
+@testset "defined point groups: rep matches permutation multiplication" begin
+
+    function composed_perm_label(ops, p)
+        for (name, perm) in ops
+            if p[1] == perm[1] && p[2] == perm[2]
+                return name
+            end
+        end
+        error("no permutation label matches composed permutation")
+    end
+
+    # Perm convention: p = (1, (a,b,c,...)) means a->1, b->2, c->3, ...
+    function compose_perm(p1, p2)
+        a = p1[2]
+        b = p2[2]
+        composed = ntuple(i -> b[a[i] - 1], length(a)) # subtle! see perm convention above. a[i] -> i, b[i] -> a[i]
+        return (p1[1], composed)
+    end
+
+    for (group, irrep) in [(C3v(), :E), (C4v(), :E), (C6v(), :E1), (C6v(), :E2)]
+        ops = SpatiallySymmetricTensors.group_elements(group)
+        rep = SpatiallySymmetricTensors.irrep_rep(group, irrep)
+        for (gname, gperm) in ops, (hname, hperm) in ops
+            ghperm = compose_perm(gperm, hperm)
+            ghname = composed_perm_label(ops, ghperm)
+            @test norm(rep[gname] * rep[hname] - rep[ghname]) < 1e-12
         end
     end
 end

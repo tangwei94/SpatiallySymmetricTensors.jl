@@ -44,3 +44,10 @@ function PEPS_tensor(x)
 end
 ```
 where `x` is the free parameter.
+
+Note: 2D "E" irreps are also supported (including C3v:E, C4v:E, C6v:E1/E2). For these, `find_solution` returns an even-length vector: the first half are the first components and the second half are their partners.
+Using the example above, 
+```julia
+sols_E = find_solution(C4v(), T0, :E)
+```
+returns a vector of size 6. The tensors appear in pairs: the multiplet tensors are `(sols_E[1], sols_E[4])`, `(sols_E[2], sols_E[5])`, and `(sols_E[3], sols_E[6]).`

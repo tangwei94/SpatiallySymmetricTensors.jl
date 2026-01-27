@@ -11,19 +11,54 @@ const C3v_ops = Dict{Symbol, C3v_perm_type}(
     :σv3 => ((1, ), (4, 3, 2)),
 )
 
-const C3v_A1_reps = Dict{Symbol, Int}(
+const C3v_A1_chars = Dict{Symbol, Int}(
     :Id => 1,
     :R1 => 1, :R2 => 1,
     :σv1 => 1, :σv2 => 1, :σv3 => 1,
 )
-const C3v_A2_reps = Dict{Symbol, Int}(
+const C3v_A2_chars = Dict{Symbol, Int}(
     :Id => 1,
     :R1 => 1, :R2 => 1,
     :σv1 => -1, :σv2 => -1, :σv3 => -1,
 )
+const C3v_E_rep = Dict{Symbol, Matrix{ComplexF64}}(
+    :Id => ComplexF64[1 0; 0 1],
+    :R1 => ComplexF64[-1/2 sqrt(3)/2; -sqrt(3)/2 -1/2],
+    :R2 => ComplexF64[-1/2 -sqrt(3)/2; sqrt(3)/2 -1/2],
+    :σv1 => ComplexF64[1 0; 0 -1],
+    :σv2 => ComplexF64[-1/2 -sqrt(3)/2; -sqrt(3)/2 1/2],
+    :σv3 => ComplexF64[-1/2 sqrt(3)/2; sqrt(3)/2 1/2],
+)
 
 group_elements(::C3v) = C3v_ops
-irrep_chars(::C3v, ::Val{:A1}) = C3v_A1_reps
-irrep_chars(::C3v, ::Val{:A2}) = C3v_A2_reps
-irrep_rep(::C3v, ::Val{:A1}) = Dict(name => [χ;;] for (name, χ) in C3v_A1_reps)
-irrep_rep(::C3v, ::Val{:A2}) = Dict(name => [χ;;] for (name, χ) in C3v_A2_reps)
+irrep_chars(::C3v, ::Val{:A1}) = C3v_A1_chars
+irrep_chars(::C3v, ::Val{:A2}) = C3v_A2_chars
+irrep_chars(::C3v, ::Val{:E}) = Dict(name => tr(mat) for (name, mat) in C3v_E_rep)
+irrep_rep(::C3v, ::Val{:A1}) = Dict(name => [χ;;] for (name, χ) in C3v_A1_chars)
+irrep_rep(::C3v, ::Val{:A2}) = Dict(name => [χ;;] for (name, χ) in C3v_A2_chars)
+irrep_rep(::C3v, ::Val{:E}) = C3v_E_rep
+
+"""
+    split_multiplets(::C3v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{<:Number}; _mapping_table=mapping_table(T))
+
+Split the E-irrep subspace `P_sol` into two multiplet components.
+"""
+function split_multiplets(::C3v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{<:Number}; _mapping_table::MappingTable=mapping_table(T))
+
+    mt = _mapping_table
+
+    f_σv1 = linear_function_for_spatial_operation(C3v_ops[:σv1])
+    rep_σv1 = irrep_rep(C3v(), :E)[:σv1] # rep_σv1 is diagonal, σv1 is hermitian
+    P_1 = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[1,1]), is_hermitian=true, _mapping_table=mt)
+    P_2_rotated = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[2,2]), is_hermitian=true, _mapping_table=mt)
+
+    # `P_2_rotated` is not uniquely determined: it is defined only up to a gauge transformation `Q` within the irrep subspace, i.e. `P_2_rotated = P_2 * Q`.
+    # We fix this gauge so that, in the chosen basis, the representation matches the E-irrep matrices in `C3v_E_rep`.
+    f_σv2 = linear_function_for_spatial_operation(C3v_ops[:σv2])
+    rep_σv2 = irrep_rep(C3v(), :E)[:σv2] # rep_σv2 not diagonal
+    mat_σv2 = matrix_for_linear_function(T, f_σv2; _mapping_table=mt)
+    Qdag = inv(rep_σv2[2, 1]) * P_2_rotated' * mat_σv2 * P_1
+    P_2 = P_2_rotated * Qdag
+
+    return P_1, P_2
+end

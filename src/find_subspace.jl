@@ -20,7 +20,7 @@ end
 """
     find_subspace_from_projector(T::AbstractTensorMap, f_proj::Function; P_filter=nothing, tol=1e-8, _mapping_table=mapping_table(T))
 
-Construct a symmetry subspace by QR-decomposing the projector matrix.
+Construct a symmetry subspace by SVD-decomposing the projector matrix.
 """
 function find_subspace_from_projector(T::AbstractTensorMap, f_proj::Function; P_filter=nothing, tol::Real=1e-8, _mapping_table::MappingTable=mapping_table(T))
     num_paras = num_free_parameters(T; _mapping_table=_mapping_table)
@@ -45,16 +45,15 @@ function find_subspace_from_projector(T::AbstractTensorMap, f_proj::Function; P_
     end
     M_sub = P_filter' * M_op * P_filter
 
-    F = qr(M_sub)
-    R = F.R
-    keep = findall(abs.(diag(R)) .> tol)
+    # SVD decomposition to find the subspace. QR decomposition can be unstable in certain cases.  
+    U, S, _ = svd(M_sub)
+    keep = findall(S .> tol)
     if isempty(keep)
         @warn "output subspace is empty, returning empty subspace"
         return P_filter[:, 1:0]
     end
 
-    Q = Matrix(F.Q)
-    return P_filter * Q[:, keep]
+    return P_filter * U[:, keep]
 end
 
 """
@@ -77,6 +76,7 @@ function find_subspace(T::AbstractTensorMap, P_init::Matrix{<:Number}, f_op::Fun
 
     M_op = matrix_for_linear_function(T, f_op; _mapping_table=_mapping_table)
     M_op_sub = P_init' * M_op * P_init
+
     if ! is_hermitian
         Λop, Uop = eigen(M_op_sub)
         Pop = Uop[:, norm.(Λop .- λ) .< tol]
