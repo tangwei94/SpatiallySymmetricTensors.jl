@@ -82,7 +82,7 @@ function split_multiplets(::C4v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{
     
     f_σv1 = linear_function_for_spatial_operation(C4v_ops[:σv1])
     rep_σv1 = irrep_rep(C4v(), :E)[:σv1] # rep_σv1 is diagonal
-    P_1 = find_subspace(T, P_sol, (x -> f_σv1(x)); λ= real(rep_σv1[1,1]), _mapping_table=mt)
+    P_1 = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[1,1]), _mapping_table=mt)
 
     f_σd1 = linear_function_for_spatial_operation(C4v_ops[:σd1])
     mat_σd1 = matrix_for_linear_function(T, f_σd1; _mapping_table=mt)

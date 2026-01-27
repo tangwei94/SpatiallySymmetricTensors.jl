@@ -42,3 +42,23 @@ irrep_chars(::C3v, ::Val{:E}) = Dict(name => tr(mat) for (name, mat) in C3v_E_re
 irrep_rep(::C3v, ::Val{:A1}) = Dict(name => [χ;;] for (name, χ) in C3v_A1_reps)
 irrep_rep(::C3v, ::Val{:A2}) = Dict(name => [χ;;] for (name, χ) in C3v_A2_reps)
 irrep_rep(::C3v, ::Val{:E}) = C3v_E_rep
+
+"""
+    split_multiplets(::C3v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{<:Number}; _mapping_table=mapping_table(T))
+
+Split the E-irrep subspace `P_sol` into two multiplet components.
+"""
+function split_multiplets(::C3v, T::AbstractTensorMap, ::Val{:E}, P_sol::Matrix{<:Number}; _mapping_table::MappingTable=mapping_table(T))
+
+    mt = _mapping_table
+
+    f_σv1 = linear_function_for_spatial_operation(C3v_ops[:σv1])
+    rep_σv1 = irrep_rep(C3v(), :E)[:σv1] # rep_σv1 is diagonal
+    P_1 = find_subspace(T, P_sol, f_σv1; λ= real(rep_σv1[1,1]), _mapping_table=mt)
+
+    f_σv2 = linear_function_for_spatial_operation(C3v_ops[:σv2])
+    mat_σv2 = matrix_for_linear_function(T, f_σv2; _mapping_table=mt)
+    P_2 = mat_σv2 * P_1 # fix the basis of P_2 to be consistent with P_1
+
+    return P_1, P_2
+end
