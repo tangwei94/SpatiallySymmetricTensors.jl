@@ -12,7 +12,6 @@ export u1_charge_conjugation, find_subspace_for_u1_charge_conjugation
 
 # Write your package code here.
 include("spatial_operations.jl");
-include("utils.jl");
 include("find_subspace.jl")
 include("pointgroup.jl")
 include("C3v.jl");

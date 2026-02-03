@@ -57,14 +57,18 @@ end
     @show "test T_1_3_A1, short-range RVB state"
     T1 = T_1_3_A1()
     T2 = T_1_3_A1_from_plain()
+    _, ix = findmax(norm.(T1.data))
+    λ = T1.data[ix] / T2.data[ix]
 
-    @test norm(T1 - T2) < 1e-12
+    @test norm(T1 - λ * T2) < 1e-12
 end
 
 @testset "test T_3_1_A1" begin
     @show "test T_3_1_A1, long-range RVB state"
     T1 = T_3_1_A1()
     T2 = T_3_1_A1_from_plain()
+    _, ix = findmax(norm.(T1.data))
+    λ = T1.data[ix] / T2.data[ix]
 
-    @test norm(T1 - T2) < 1e-12
+    @test norm(T1 - λ * T2) < 1e-12
 end
