@@ -1,7 +1,7 @@
 name = "SpatiallySymmetricTensors"
 uuid = "267f34df-16a8-4a72-a26d-fb880b511394"
 authors = ["Wei Tang <tangwei@smail.nju.edu.cn> and contributors"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
